@@ -13,6 +13,7 @@
 
 #include <midifile/MidiFile.h>
 #include <utils/rng.hpp>
+#include <utils/logging.hpp>
 
 class Piano {
 
