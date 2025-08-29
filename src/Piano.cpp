@@ -5,7 +5,8 @@ Piano::Piano()
 	: m_sample_rate(44100) {
 
 	GenerateKeyFrequencies();
-	GenerateWaveTable();
+	SetKeyPositions();
+	//GenerateWaveTable();
 }
 
 void Piano::GenerateWaveTable() {
@@ -196,8 +197,77 @@ void Piano::GenerateKeyFrequencies() {
 	m_keys.reserve(88);
 
 	for (int i = 0; i < 88; i++) {
+
 		float frequency = GenerateKeyFrequency(i + 1);
 
-		m_keys.emplace_back(PianoKey(frequency));
+		m_keys.emplace_back(PianoKey(frequency, i + 21, 
+			IsKeyBlack(i + 21) ? BLACK : WHITE,
+			IsKeyBlack(i + 21) ? sf::Color::Black : sf::Color::White));
 	}
+}
+void Piano::SetKeyPositions() {
+
+	float windowWidth = 1600.f;
+	float gap = 2.f;
+	int numKeys = 88;
+	int numBlackKeys = 36;
+
+	float totalGapWidth = (52 - 1) * gap;
+	float totalKeyWidth = windowWidth - totalGapWidth;
+	float keyWidth = totalKeyWidth / 52;
+
+	// Space out white keys
+	int keyIndex = 0;
+	for (int i = 0; i < numKeys; i++) {
+
+		if (IsKeyBlack(i + 21)) {
+
+			continue;
+		}
+
+		sf::Vector2f position = { keyIndex * (keyWidth + gap), 0.f };
+		m_keys[i].SetKeyPosition(position);
+
+		keyIndex++;
+	}
+
+	totalGapWidth = (36) * gap;
+	totalKeyWidth = windowWidth - totalGapWidth;
+	keyWidth = totalKeyWidth / 36;
+
+	// Space out black keys
+	for (int i = 0; i < numKeys; i++) {
+
+		if (!IsKeyBlack(i + 21)) {
+
+			continue;
+		}
+
+		sf::Vector2f position = { (m_keys[i - 1].GetKeyPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f), 0.f};
+		m_keys[i].SetKeyPosition(position);
+	}
+}
+
+void Piano::DrawKeys(sf::RenderWindow& window) {
+
+	for (int i = 0; i < 88; i++) {
+
+		if(!IsKeyBlack(i + 21))
+			m_keys[i].Draw(window);
+	}
+
+	for (int i = 0; i < 88; i++) {
+
+		if (IsKeyBlack(i + 21))
+			m_keys[i].Draw(window);
+	}
+}
+
+bool Piano::IsKeyBlack(int keyNumber) {
+
+	int noteInOctave = keyNumber % 12;
+
+	return noteInOctave == 1 || noteInOctave == 3 ||
+		noteInOctave == 6 || noteInOctave == 8 ||
+		noteInOctave == 10;
 }

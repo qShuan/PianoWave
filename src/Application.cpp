@@ -1,7 +1,7 @@
 #include "Application.h"
 
 Application::Application()
-	: m_window(sf::RenderWindow(sf::VideoMode(800, 600), "Piano Wave", sf::Style::Titlebar | sf::Style::Close)) {
+	: m_window(sf::RenderWindow(sf::VideoMode(1600, 900), "Piano Wave", sf::Style::Titlebar | sf::Style::Close)) {
 
 	m_window.setKeyRepeatEnabled(false);
 }
@@ -50,6 +50,8 @@ void Application::Run() {
 		}
 
 		m_window.clear();
+
+		m_piano.DrawKeys(m_window);
 
 		m_window.display();
 	}

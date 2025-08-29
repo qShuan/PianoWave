@@ -41,12 +41,17 @@ private:
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
+	void SetKeyPositions();
 	void LoadMusicFile(const std::string& fileName);
+
+	bool IsKeyBlack(int keyNumber);
 
 public:
 
 	Piano();
 	~Piano() = default;
+
+	void DrawKeys(sf::RenderWindow& window);
 
 	void StrikeKey(int keyNumber) {
 
