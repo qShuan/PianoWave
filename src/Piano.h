@@ -41,7 +41,6 @@ private:
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
-	void SetKeyPositions();
 	void LoadMusicFile(const std::string& fileName);
 
 	bool IsKeyBlack(int keyNumber);
@@ -59,6 +58,8 @@ public:
 	}
 
 	void PlaySong();
+
+	void SetKeyPositions(float windowWidth, float windowHeight);
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 };

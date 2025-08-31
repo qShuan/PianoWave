@@ -1,9 +1,10 @@
 #include "Application.h"
 
 Application::Application()
-	: m_window(sf::RenderWindow(sf::VideoMode(1600, 900), "Piano Wave", sf::Style::Titlebar | sf::Style::Close)) {
+	: m_window(sf::RenderWindow(sf::VideoMode(g_window_settings.width, g_window_settings.height), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)) {
 
 	m_window.setKeyRepeatEnabled(false);
+	m_piano.SetKeyPositions((float)g_window_settings.width, (float)g_window_settings.height);
 }
 
 void Application::HandleEvents(sf::Event& event) {

@@ -4,31 +4,34 @@
 PianoKey::PianoKey(float frequency, float midiNote, KeyType keyType, sf::Color color)
 	: m_key_type(keyType),
 	m_width(0.f),
-	m_height(0.f),
+	m_height(150.f),
 	m_frequency(frequency),
 	m_midi_note(midiNote) {
 
-	InitShape();
+	UpdateSize();
 	m_key_shape.setFillColor(color);
 }
 
-void PianoKey::InitShape() {
+void PianoKey::UpdateSize() {
 
-	float width = 0.f;
-
-	if(!IsBlack())
-		width = (1600.f) / (52.f);
-	else
-		width = (1600.f) / (88.f);
-
-	m_width = width;
-
-	m_key_shape.setSize({ width - 2.f, IsBlack() ? 150.f : 200.f});
+	m_key_shape.setSize({ m_width, m_height });
 }
 
 void PianoKey::SetKeyPosition(const sf::Vector2f& position) {
 
 	m_key_shape.setPosition(position);
+}
+
+void PianoKey::SetKeyHeight(float height) {
+	
+	m_height = height;
+	UpdateSize();
+}
+
+void PianoKey::SetKeyWidth(float width) {
+
+	m_width = width;
+	UpdateSize();
 }
 
 void PianoKey::Draw(sf::RenderWindow& window) {
