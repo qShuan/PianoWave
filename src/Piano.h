@@ -16,8 +16,9 @@
 #include <utils/logging.hpp>
 
 #include <future>
+#include <array>
 
-constexpr int g_number_of_keys = 88;
+constexpr size_t g_number_of_keys = 88;
 
 class Piano {
 
@@ -33,10 +34,10 @@ private:
 	};
 
 
-	std::vector<sf::SoundBuffer> m_sound_buffers;
-	std::vector<sf::Sound> m_sound_wave_table;
+	std::array<sf::SoundBuffer, g_number_of_keys> m_sound_buffers;
+	std::array<sf::Sound, g_number_of_keys> m_sound_wave_table;
 
-	std::vector<PianoKey> m_keys;
+	std::array<PianoKey, g_number_of_keys> m_keys;
 	std::vector<NoteEvent> m_note_events;
 
 	std::vector<std::future<void>> m_key_sound_futures;

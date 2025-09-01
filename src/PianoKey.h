@@ -23,6 +23,7 @@ private:
 
 public:
 
+	PianoKey();
 	PianoKey(float frequency, int midiNote, KeyType keyType, sf::Color color = sf::Color::White);
 	~PianoKey() = default;
 

@@ -16,10 +16,6 @@ void Piano::GenerateWaveTable() {
 
 	LOG("-- Generating key waveforms --");
 
-	m_sound_buffers.resize(g_number_of_keys);
-	m_sound_wave_table.clear();
-	m_sound_wave_table.resize(g_number_of_keys);
-
 	float duration = 3.f;
 
 	LOG("-- Creating threads --");
@@ -257,15 +253,13 @@ void Piano::GenerateKeyFrequencies() {
 
 	LOG("-- Generating key frequencies --");
 
-	m_keys.reserve(g_number_of_keys);
-
 	for (int i = 0; i < g_number_of_keys; i++) {
 
 		float frequency = GenerateKeyFrequency(i + 1);
 
-		m_keys.emplace_back(PianoKey(frequency, i + 21, 
+		m_keys[i] = PianoKey(frequency, i + 21, 
 			IsKeyBlack(i + 21) ? BLACK : WHITE,
-			IsKeyBlack(i + 21) ? sf::Color::Black : sf::Color::White));
+			IsKeyBlack(i + 21) ? sf::Color::Black : sf::Color::White);
 	}
 }
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
