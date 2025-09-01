@@ -1,7 +1,7 @@
 #include "PianoKey.h"
 #include <print>
 
-PianoKey::PianoKey(float frequency, float midiNote, KeyType keyType, sf::Color color)
+PianoKey::PianoKey(float frequency, int midiNote, KeyType keyType, sf::Color color)
 	: m_key_type(keyType),
 	m_width(0.f),
 	m_height(150.f),

@@ -23,7 +23,7 @@ private:
 
 public:
 
-	PianoKey(float frequency, float midiNote, KeyType keyType, sf::Color color = sf::Color::White);
+	PianoKey(float frequency, int midiNote, KeyType keyType, sf::Color color = sf::Color::White);
 	~PianoKey() = default;
 
 	void Draw(sf::RenderWindow& window);

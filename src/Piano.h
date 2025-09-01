@@ -46,6 +46,8 @@ private:
 
 	void GenerateWaveTable();
 	void GenerateKeyWaveForm(int keyNumber, float duration);
+	std::vector<sf::Int16> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
+	float GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency);
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
