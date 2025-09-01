@@ -142,10 +142,15 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 
 	std::ifstream file(fileName, std::ios::binary);
 
+	if (!file.is_open()) {
+		LOG("-- File {} couldn't be loaded --", fileName);
+		return;
+	}
+
 	smf::MidiFile midifile;
 
 	if (!midifile.read(file)) {
-		LOG("-- File {} couldn't be loaded --", fileName);
+		LOG("-- Midifile {} couldn't be loaded --", fileName);
 		return;
 	}
 
