@@ -26,6 +26,7 @@ private:
 	struct NoteEvent {
 		int note;
 		double duration;
+		double timeToNextNote;
 		double startTime;
 		sf::Clock clock;
 		bool hasBeenStruck = false;

@@ -168,7 +168,8 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 				NoteEvent n;
 				n.note = midifile[track][event].getKeyNumber();
 				n.startTime = midifile[track][event].seconds;
-				n.duration = 0.f;
+				n.duration = midifile[track][event].getDurationInSeconds();
+				n.timeToNextNote = 0.f;
 
 				m_note_events.emplace_back(n);
 			}
@@ -177,10 +178,7 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 
 	for (int i = 0; i + 1 < m_note_events.size(); i++) {
 
-		m_note_events[i].duration = m_note_events[i + 1].startTime - m_note_events[i].startTime;
-
-		if (m_note_events[i + 1].startTime - m_note_events[i].startTime < 0.001f)
-			m_note_events[i].duration + 0.2;
+		m_note_events[i].timeToNextNote = m_note_events[i + 1].startTime - m_note_events[i].startTime;
 	}
 
 	LOG("-- File {} has been successfully loaded --", fileName);
@@ -199,7 +197,7 @@ void Piano::PlaySong() {
 		m_note_events[m_current_note_index].hasBeenStruck = true;
 	}
 
-	if (m_note_events[m_current_note_index].clock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].duration) {
+	if (m_note_events[m_current_note_index].clock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].timeToNextNote) {
 
 		m_note_events[m_current_note_index].hasBeenStruck = false;
 		m_current_note_index++;
