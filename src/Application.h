@@ -1,4 +1,5 @@
 #include "Piano.h"
+#include "GUI.h"
 
 struct WindowSettings {
 
@@ -15,6 +16,8 @@ private:
 
 	sf::RenderWindow m_window;
 
+	GUI m_gui;
+
 	Piano m_piano;
 
 public:
@@ -24,4 +27,5 @@ public:
 
 	void HandleEvents(sf::Event& event);
 	void Run();
+	void HandleGUI();
 };

@@ -1,13 +1,16 @@
 #include "Application.h"
 
 Application::Application()
-	: m_window(sf::RenderWindow(sf::VideoMode(g_window_settings.width, g_window_settings.height), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)) {
+	: m_window(sf::RenderWindow(sf::VideoMode(g_window_settings.width, g_window_settings.height), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)),
+	m_gui(GUI(m_window)){
 
 	m_window.setKeyRepeatEnabled(false);
 	m_piano.SetKeyPositions((float)g_window_settings.width, (float)g_window_settings.height);
 }
 
 void Application::HandleEvents(sf::Event& event) {
+
+	m_gui.ProcessEvent(m_window, event);
 
 	if (event.type == __noop) {
 		m_window.close();
@@ -41,6 +44,8 @@ void Application::HandleEvents(sf::Event& event) {
 
 void Application::Run() {
 
+	sf::Clock clock;
+
 	while (m_window.isOpen()) {
 
 		sf::Event event;
@@ -50,10 +55,28 @@ void Application::Run() {
 			HandleEvents(event);
 		}
 
+		sf::Time sec = clock.restart();
+		m_gui.Update(m_window, sec);
+
 		m_window.clear();
 
 		m_piano.DrawKeys(m_window);
 
+		HandleGUI();
+		m_gui.Render(m_window);
+
 		m_window.display();
 	}
+
+	m_gui.Close();
+}
+
+void Application::HandleGUI() {
+
+	ImGui::Begin("File Handling", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 3.f, (float)g_window_settings.height - 150.f));
+	ImGui::SetWindowPos(ImVec2(0.f, 0.f));
+
+	ImGui::End();
 }
