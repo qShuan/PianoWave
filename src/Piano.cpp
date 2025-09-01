@@ -6,9 +6,13 @@ Piano::Piano()
 
 	GenerateKeyFrequencies();
 	GenerateWaveTable();
+
+	LOG("-- Piano has been initialized --");
 }
 
 void Piano::GenerateWaveTable() {
+
+	LOG("-- Generating key waveforms --");
 
 	m_sound_buffers.resize(88);
 	m_sound_wave_table.clear();
@@ -16,12 +20,14 @@ void Piano::GenerateWaveTable() {
 
 	float duration = 3.f;
 
+	LOG("-- Creating threads --");
 	// Generate samples for each key
 	for (int keyNumber = 0; keyNumber < 88; keyNumber++) {
 
 		m_key_sound_futures.emplace_back(std::async(std::launch::async, &Piano::GenerateKeyWaveForm, this, keyNumber, duration));
 	}
 
+	LOG("-- Waiting for threads to finish --");
 	// Wait for all threads to finish before using the buffers
 	for (auto& future : m_key_sound_futures) {
 		future.get();
@@ -103,9 +109,13 @@ void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, m_sample_rate);
 	m_sound_wave_table[keyNumber].setBuffer(m_sound_buffers[keyNumber]);
+
+	LOG("-- Key: {} has been generated --", keyNumber);
 }
 
 void Piano::LoadMusicFile(const std::string& fileName) {
+
+	LOG("-- Loading file: {} --", fileName);
 
 	m_note_events.clear();
 
@@ -113,7 +123,11 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 
 	smf::MidiFile midifile;
 
-	midifile.read(file);
+	if (!midifile.read(file)) {
+		LOG("-- File: {} couldn't be loaded --", fileName);
+		return;
+	}
+
 	midifile.doTimeAnalysis();
 	midifile.linkNotePairs();
 
@@ -143,6 +157,7 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 			m_note_events[i].duration + 0.2;
 	}
 
+	LOG("-- File: {} has been successfully loaded --", fileName);
 }
 
 void Piano::PlaySong() {
@@ -206,6 +221,8 @@ float Piano::GenerateKeyFrequency(int keyNumber) {
 }
 
 void Piano::GenerateKeyFrequencies() {
+
+	LOG("-- Generating key frequencies --");
 
 	m_keys.reserve(88);
 
