@@ -15,6 +15,8 @@
 #include <utils/rng.hpp>
 #include <utils/logging.hpp>
 
+#include <future>
+
 class Piano {
 
 private:
@@ -25,19 +27,25 @@ private:
 		double startTime;
 	};
 
+
 	std::vector<sf::SoundBuffer> m_sound_buffers;
 	std::vector<sf::Sound> m_sound_wave_table;
 
 	std::vector<PianoKey> m_keys;
 	std::vector<NoteEvent> m_note_events;
 
+	std::vector<std::future<void>> m_key_sound_futures;
+
 	std::vector<sf::Int16> m_samples;
+
+	std::mutex m_key_sound_mutex;
 
 	float m_sample_rate;
 
 private:
 
 	void GenerateWaveTable();
+	void GenerateKeyWaveForm(int keyNumber, float duration);
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();

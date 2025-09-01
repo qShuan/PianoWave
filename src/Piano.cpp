@@ -5,7 +5,7 @@ Piano::Piano()
 	: m_sample_rate(44100) {
 
 	GenerateKeyFrequencies();
-	//GenerateWaveTable();
+	GenerateWaveTable();
 }
 
 void Piano::GenerateWaveTable() {
@@ -16,81 +16,93 @@ void Piano::GenerateWaveTable() {
 
 	float duration = 3.f;
 
-	std::vector<sf::Int16> samples;
-	samples.resize(m_sample_rate * duration);
-
 	// Generate samples for each key
 	for (int keyNumber = 0; keyNumber < 88; keyNumber++) {
 
-		PianoKey& key = m_keys[keyNumber];
+		m_key_sound_futures.emplace_back(std::async(std::launch::async, &Piano::GenerateKeyWaveForm, this, keyNumber, duration));
+	}
 
-		float maxFreq = 4187.f;
-		float nyquist = maxFreq / 2.f;
+	// Wait for all threads to finish before using the buffers
+	for (auto& future : m_key_sound_futures) {
+		future.get();
+	}
+	m_key_sound_futures.clear();
+}
 
-		float normalizedFreq = key.GetFrequency() / maxFreq;
+void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
-		// Overtones
-		int maxOvertones = std::min(10, (int)(m_sample_rate / (2 * key.GetFrequency())));
+	std::vector<sf::Int16> samples;
+	samples.resize(m_sample_rate * duration);
 
-		for (int i = 0; i < m_sample_rate * duration; i++) {
+	PianoKey& key = m_keys[keyNumber];
 
-			float t = (float)i / (m_sample_rate);
+	float maxFreq = 4187.f;
+	float nyquist = maxFreq / 2.f;
 
-			float overtonesValue = 0.f;
+	float normalizedFreq = key.GetFrequency() / maxFreq;
 
-			// A hammer-like strike effect
-			if (t < 0.1f) {
+	// Overtones
+	int maxOvertones = std::min(10, (int)(m_sample_rate / (2 * key.GetFrequency())));
 
-				overtonesValue += utils::rng::FastRandom() * exp(-t * 1000.f);
+	for (int i = 0; i < m_sample_rate * duration; i++) {
 
-				for (int ot = maxOvertones / 2; ot <= maxOvertones; ot++) {
-					float overtoneFrequency = key.GetFrequency() * ot;
-					overtonesValue += 1.6f * cos(0.2f * M_PI * overtoneFrequency * t) * exp(-t * 1000.f);
-				}
-			}
+		float t = (float)i / (m_sample_rate);
 
-			float brightnessBoost = 1.f;
-			float decayFactor = 1.f;
+		float overtonesValue = 0.f;
 
-			for (int ot = 1; ot <= maxOvertones; ot++) {
+		// A hammer-like strike effect
+		if (t < 0.1f) {
 
-				float sign = (ot % 2 == 0 ? 1.f : -1.f);
+			overtonesValue += utils::rng::FastRandom() * exp(-t * 1000.f);
 
+			for (int ot = maxOvertones / 2; ot <= maxOvertones; ot++) {
 				float overtoneFrequency = key.GetFrequency() * ot;
-
-				//The higher the note, the faster it decays
-				decayFactor += (3.f - decayFactor) * normalizedFreq;
-
-				// The higher the note, the more quiet it becomes
-				brightnessBoost += (0.5f - brightnessBoost) * normalizedFreq;
-
-				// Sawtooth wave
-				overtonesValue += brightnessBoost * (
-					sign * sin(2.f * M_PI * overtoneFrequency * t) / ((float)ot)
-					) * exp(-t * ot * decayFactor);
-
-				//Triangle wave
-				overtonesValue += brightnessBoost * (
-					sign * sin(2.f * M_PI * (2.f * ot - 1) * key.GetFrequency() * t) / ((2.f * ot - 1) * (2.f * ot - 1) * 2.f)
-					) * exp(-t * ot * decayFactor);
-
-				// Detuning
-				float detune = 1.002f;
-				overtonesValue += 0.02f * sin(2.0f * M_PI * key.GetFrequency() * detune * t) * exp(-t * (float)ot);
+				overtonesValue += 1.6f * cos(0.2f * M_PI * overtoneFrequency * t) * exp(-t * 1000.f);
 			}
-
-			// Apply amplitude modifications
-			float env = ADSR(t, duration, keyNumber);
-			overtonesValue *= 2.f / M_PI + 8.f / (M_PI * M_PI);
-			overtonesValue *= env;
-
-			sf::Int16 sample = (sf::Int16)(32767 * 0.1f * overtonesValue);
-			samples[i] = sample;
 		}
 
-		m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, m_sample_rate);
-		m_sound_wave_table[keyNumber].setBuffer(m_sound_buffers[keyNumber]);
+		float brightnessBoost = 1.f;
+		float decayFactor = 1.f;
+
+		for (int ot = 1; ot <= maxOvertones; ot++) {
+
+			float sign = (ot % 2 == 0 ? 1.f : -1.f);
+
+			float overtoneFrequency = key.GetFrequency() * ot;
+
+			//The higher the note, the faster it decays
+			decayFactor += (3.f - decayFactor) * normalizedFreq;
+
+			// The higher the note, the more quiet it becomes
+			brightnessBoost += (0.5f - brightnessBoost) * normalizedFreq;
+
+			// Sawtooth wave
+			overtonesValue += brightnessBoost * (
+				sign * sin(2.f * M_PI * overtoneFrequency * t) / ((float)ot)
+				) * exp(-t * ot * decayFactor);
+
+			//Triangle wave
+			overtonesValue += brightnessBoost * (
+				sign * sin(2.f * M_PI * (2.f * ot - 1) * key.GetFrequency() * t) / ((2.f * ot - 1) * (2.f * ot - 1) * 2.f)
+				) * exp(-t * ot * decayFactor);
+
+			// Detuning
+			float detune = 1.002f;
+			overtonesValue += 0.02f * sin(2.0f * M_PI * key.GetFrequency() * detune * t) * exp(-t * (float)ot);
+		}
+
+		// Apply amplitude modifications
+		float env = ADSR(t, duration, keyNumber);
+		overtonesValue *= 2.f / M_PI + 8.f / (M_PI * M_PI);
+		overtonesValue *= env;
+
+		sf::Int16 sample = (sf::Int16)(32767 * 0.1f * overtonesValue);
+
+		samples[i] = sample;
 	}
+
+	m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, m_sample_rate);
+	m_sound_wave_table[keyNumber].setBuffer(m_sound_buffers[keyNumber]);
 }
 
 void Piano::LoadMusicFile(const std::string& fileName) {
