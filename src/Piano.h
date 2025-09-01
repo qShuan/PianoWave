@@ -27,6 +27,8 @@ private:
 		int note;
 		double duration;
 		double startTime;
+		sf::Clock clock;
+		bool hasBeenStruck = false;
 	};
 
 
@@ -40,9 +42,9 @@ private:
 
 	std::vector<sf::Int16> m_samples;
 
-	std::mutex m_key_sound_mutex;
-
 	float m_sample_rate;
+
+	int m_current_note_index;
 
 private:
 

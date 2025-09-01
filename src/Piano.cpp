@@ -2,10 +2,12 @@
 #include <print>
 
 Piano::Piano()
-	: m_sample_rate(44100) {
+	: m_sample_rate(44100),
+	m_current_note_index(0) {
 
 	GenerateKeyFrequencies();
 	GenerateWaveTable();
+	LoadMusicFile("nocturne.mid");
 
 	LOG("-- Piano has been initialized --");
 }
@@ -143,7 +145,7 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 	smf::MidiFile midifile;
 
 	if (!midifile.read(file)) {
-		LOG("-- File: {} couldn't be loaded --", fileName);
+		LOG("-- File {} couldn't be loaded --", fileName);
 		return;
 	}
 
@@ -176,17 +178,26 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 			m_note_events[i].duration + 0.2;
 	}
 
-	LOG("-- File: {} has been successfully loaded --", fileName);
+	LOG("-- File {} has been successfully loaded --", fileName);
 }
 
 void Piano::PlaySong() {
 
-	int i = 1;
-	for (auto& n : m_note_events) {
-		std::println("Playing Note ({}/{}): {}", i, m_note_events.size(), n.note);
-		StrikeKey(n.note);
-		sf::sleep(sf::seconds((float)n.duration));
-		i++;
+	if (m_note_events.empty())
+		return;
+
+	if (!m_note_events[m_current_note_index].hasBeenStruck) {
+
+		StrikeKey(m_note_events[m_current_note_index].note);
+		m_note_events[m_current_note_index].clock.restart();
+
+		m_note_events[m_current_note_index].hasBeenStruck = true;
+	}
+
+	if (m_note_events[m_current_note_index].clock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].duration) {
+
+		m_note_events[m_current_note_index].hasBeenStruck = false;
+		m_current_note_index++;
 	}
 }
 
