@@ -17,6 +17,8 @@
 
 #include <future>
 
+constexpr int g_number_of_keys = 88;
+
 class Piano {
 
 private:

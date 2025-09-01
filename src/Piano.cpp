@@ -14,15 +14,15 @@ void Piano::GenerateWaveTable() {
 
 	LOG("-- Generating key waveforms --");
 
-	m_sound_buffers.resize(88);
+	m_sound_buffers.resize(g_number_of_keys);
 	m_sound_wave_table.clear();
-	m_sound_wave_table.resize(88);
+	m_sound_wave_table.resize(g_number_of_keys);
 
 	float duration = 3.f;
 
 	LOG("-- Creating threads --");
 	// Generate samples for each key
-	for (int keyNumber = 0; keyNumber < 88; keyNumber++) {
+	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
 
 		m_key_sound_futures.emplace_back(std::async(std::launch::async, &Piano::GenerateKeyWaveForm, this, keyNumber, duration));
 	}
@@ -243,9 +243,9 @@ void Piano::GenerateKeyFrequencies() {
 
 	LOG("-- Generating key frequencies --");
 
-	m_keys.reserve(88);
+	m_keys.reserve(g_number_of_keys);
 
-	for (int i = 0; i < 88; i++) {
+	for (int i = 0; i < g_number_of_keys; i++) {
 
 		float frequency = GenerateKeyFrequency(i + 1);
 
@@ -257,7 +257,6 @@ void Piano::GenerateKeyFrequencies() {
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 	float gap = 2.f;
-	int numKeys = 88;
 	int numWhiteKeys = 52;
 	int numBlackKeys = 36;
 
@@ -267,7 +266,7 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 	// Space out white keys
 	int keyIndex = 0;
-	for (int i = 0; i < numKeys; i++) {
+	for (int i = 0; i < g_number_of_keys; i++) {
 
 		if (IsKeyBlack(i + 21))
 			continue;
@@ -280,7 +279,7 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 	}
 
 	// Space out black keys
-	for (int i = 0; i < numKeys; i++) {
+	for (int i = 0; i < g_number_of_keys; i++) {
 
 		if (!IsKeyBlack(i + 21))
 			continue;
@@ -294,13 +293,13 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 void Piano::DrawKeys(sf::RenderWindow& window) {
 
-	for (int i = 0; i < 88; i++) {
+	for (int i = 0; i < g_number_of_keys; i++) {
 
 		if(!IsKeyBlack(i + 21))
 			m_keys[i].Draw(window);
 	}
 
-	for (int i = 0; i < 88; i++) {
+	for (int i = 0; i < g_number_of_keys; i++) {
 
 		if (IsKeyBlack(i + 21))
 			m_keys[i].Draw(window);
