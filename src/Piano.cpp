@@ -184,11 +184,13 @@ void Piano::StrikeKey(int keyNumber) {
 
 	m_sound_wave_table[keyNumber - 21].play();
 	m_keys[keyNumber - 21].SetKeyColor(g_pressed_key_color);
+	m_keys[keyNumber - 21].SetStruck(true);
 }
 
 void Piano::ReleaseKey(int keyNumber) {
 
 	m_keys[keyNumber - 21].SetKeyColor(m_keys[keyNumber - 21].GetOriginalColor());
+	m_keys[keyNumber - 21].SetStruck(false);
 }
 
 void Piano::PlaySong() {

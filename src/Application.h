@@ -20,12 +20,20 @@ private:
 
 	Piano m_piano;
 
+	std::array<PianoKey, g_number_of_keys>& m_piano_keys;
+
+	bool m_is_mouse_left_pressed;
+
+private:
+
+	void HandleEvents(sf::Event& event);
+	void HandlePianoKeyStrikes();
+	void HandleGUI();
+
 public:
 
 	Application();
 	~Application() = default;
 
-	void HandleEvents(sf::Event& event);
 	void Run();
-	void HandleGUI();
 };
