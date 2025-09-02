@@ -29,7 +29,8 @@ private:
 		double duration;
 		double timeToNextNote;
 		double startTime;
-		sf::Clock clock;
+		sf::Clock nextNoteClock;
+		sf::Clock durationClock;
 		bool hasBeenStruck = false;
 	};
 
@@ -41,6 +42,8 @@ private:
 	std::vector<NoteEvent> m_note_events;
 
 	std::vector<std::future<void>> m_key_sound_futures;
+
+	std::vector<int> m_pressed_note_indices;
 
 	std::vector<sf::Int16> m_samples;
 
@@ -68,10 +71,9 @@ public:
 
 	void DrawKeys(sf::RenderWindow& window);
 
-	void StrikeKey(int keyNumber) {
+	void StrikeKey(int keyNumber);
 
-		m_sound_wave_table[keyNumber - 21].play();
-	}
+	void ReleaseKey(int keyNumber);
 
 	void PlaySong();
 

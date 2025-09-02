@@ -180,6 +180,17 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 	LOG("-- File {} has been successfully loaded --", fileName);
 }
 
+void Piano::StrikeKey(int keyNumber) {
+
+	m_sound_wave_table[keyNumber - 21].play();
+	m_keys[keyNumber - 21].SetKeyColor(g_pressed_key_color);
+}
+
+void Piano::ReleaseKey(int keyNumber) {
+
+	m_keys[keyNumber - 21].SetKeyColor(m_keys[keyNumber - 21].GetOriginalColor());
+}
+
 void Piano::PlaySong() {
 
 	if (m_note_events.empty())
@@ -188,15 +199,31 @@ void Piano::PlaySong() {
 	if (!m_note_events[m_current_note_index].hasBeenStruck) {
 
 		StrikeKey(m_note_events[m_current_note_index].note);
-		m_note_events[m_current_note_index].clock.restart();
+		m_note_events[m_current_note_index].nextNoteClock.restart();
+		m_note_events[m_current_note_index].durationClock.restart();
+
+		// Save the note index
+		m_pressed_note_indices.emplace_back(m_current_note_index);
 
 		m_note_events[m_current_note_index].hasBeenStruck = true;
 	}
 
-	if (m_note_events[m_current_note_index].clock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].timeToNextNote) {
+	if (m_note_events[m_current_note_index].nextNoteClock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].timeToNextNote) {
 
 		m_note_events[m_current_note_index].hasBeenStruck = false;
 		m_current_note_index++;
+	}
+
+	// Release all keys that have been held for their full duration
+	for (int i = m_pressed_note_indices.size() - 1; i >= 0; i--) {
+
+		int noteIndex = m_pressed_note_indices[i];
+
+		if (m_note_events[noteIndex].durationClock.getElapsedTime().asSeconds() >= m_note_events[noteIndex].duration) {
+
+			ReleaseKey(m_note_events[noteIndex].note);
+			m_pressed_note_indices.erase(m_pressed_note_indices.begin() + i);
+		}
 	}
 }
 
