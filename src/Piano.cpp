@@ -172,7 +172,7 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 		}
 	}
 
-	for (int i = 0; i + 1 < m_note_events.size(); i++) {
+	for (size_t i = 0; i + 1 < m_note_events.size(); i++) {
 
 		m_note_events[i].timeToNextNote = m_note_events[i + 1].startTime - m_note_events[i].startTime;
 	}
@@ -217,7 +217,7 @@ void Piano::PlaySong() {
 	}
 
 	// Release all keys that have been held for their full duration
-	for (int i = m_pressed_note_indices.size() - 1; i >= 0; i--) {
+	for (int i = (int)m_pressed_note_indices.size() - 1; i >= 0; i--) {
 
 		int noteIndex = m_pressed_note_indices[i];
 
