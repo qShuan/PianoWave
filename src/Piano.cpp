@@ -238,15 +238,14 @@ void Piano::StartComposition() {
 		return;
 
 	m_is_composition_playing = true;
-	m_current_note_index = 0;
 }
 
-void Piano::PauseUnpauseComposition() {
+void Piano::PauseComposition() {
 
 	if (m_note_events.empty())
 		return;
 
-	m_is_composition_playing = !m_is_composition_playing;
+	m_is_composition_playing = false;
 }
 
 void Piano::RestartComposition() {

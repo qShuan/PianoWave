@@ -146,14 +146,14 @@ void Application::HandleGUI() {
 	ImGui::NewLine();
 
 	ImGui::SeparatorText("Composition");
-	if (ImGui::Button("Play")) {
+	if (ImGui::Button("Start")) {
 
 		m_piano.StartComposition();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button(m_piano.IsCompositionPlaying() ? "Pause" : "Unpause")) {
+	if (ImGui::Button("Pause")) {
 
-		m_piano.PauseUnpauseComposition();
+		m_piano.PauseComposition();
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Restart")) {

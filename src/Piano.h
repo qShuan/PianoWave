@@ -78,7 +78,7 @@ public:
 
 	void PlayComposition();
 	void StartComposition();
-	void PauseUnpauseComposition();
+	void PauseComposition();
 	void RestartComposition();
 	void LoadMidiFile(const std::string& fileName);
 
