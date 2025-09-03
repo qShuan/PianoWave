@@ -51,6 +51,8 @@ private:
 
 	int m_current_note_index;
 
+	bool m_is_composition_playing;
+
 private:
 
 	void GenerateWaveTable();
@@ -60,7 +62,6 @@ private:
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
-	void LoadMusicFile(const std::string& fileName);
 
 	bool IsKeyBlack(int keyNumber);
 
@@ -75,10 +76,15 @@ public:
 
 	void ReleaseKey(int keyNumber);
 
-	void PlaySong();
+	void PlayComposition();
+	void StartComposition();
+	void PauseUnpauseComposition();
+	void RestartComposition();
+	void LoadMidiFile(const std::string& fileName);
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }
+	bool IsCompositionPlaying() const { return m_is_composition_playing; }
 };

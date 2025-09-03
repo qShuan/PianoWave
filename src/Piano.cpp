@@ -3,11 +3,11 @@
 
 Piano::Piano()
 	: m_sample_rate(44100),
-	m_current_note_index(0) {
+	m_current_note_index(0),
+	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
 	GenerateWaveTable();
-	LoadMusicFile("nocturne.mid");
 
 	LOG("-- Piano has been initialized --");
 }
@@ -130,7 +130,7 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 	return overtonesValue;
 }
 
-void Piano::LoadMusicFile(const std::string& fileName) {
+void Piano::LoadMidiFile(const std::string& fileName) {
 
 	LOG("-- Loading file: {} --", fileName);
 
@@ -177,6 +177,9 @@ void Piano::LoadMusicFile(const std::string& fileName) {
 		m_note_events[i].timeToNextNote = m_note_events[i + 1].startTime - m_note_events[i].startTime;
 	}
 
+	m_is_composition_playing = false;
+	m_current_note_index = 0;
+
 	LOG("-- File {} has been successfully loaded --", fileName);
 }
 
@@ -193,9 +196,9 @@ void Piano::ReleaseKey(int keyNumber) {
 	m_keys[keyNumber - 21].SetStruck(false);
 }
 
-void Piano::PlaySong() {
+void Piano::PlayComposition() {
 
-	if (m_note_events.empty())
+	if (m_note_events.empty() || !m_is_composition_playing)
 		return;
 
 	if (!m_note_events[m_current_note_index].hasBeenStruck) {
@@ -227,6 +230,31 @@ void Piano::PlaySong() {
 			m_pressed_note_indices.erase(m_pressed_note_indices.begin() + i);
 		}
 	}
+}
+
+void Piano::StartComposition() {
+
+	if (m_note_events.empty())
+		return;
+
+	m_is_composition_playing = true;
+	m_current_note_index = 0;
+}
+
+void Piano::PauseUnpauseComposition() {
+
+	if (m_note_events.empty())
+		return;
+
+	m_is_composition_playing = !m_is_composition_playing;
+}
+
+void Piano::RestartComposition() {
+
+	if (m_note_events.empty())
+		return;
+
+	m_current_note_index = 0;
 }
 
 float Piano::ADSR(float t, float duration, int keyNumber) {

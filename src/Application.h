@@ -1,5 +1,6 @@
 #include "Piano.h"
 #include "GUI.h"
+#include "NFDHandler.h"
 
 struct WindowSettings {
 
@@ -21,6 +22,8 @@ private:
 	Piano m_piano;
 
 	std::array<PianoKey, g_number_of_keys>& m_piano_keys;
+
+	NFDHandler m_nfd_handler;
 
 	bool m_is_mouse_left_pressed;
 

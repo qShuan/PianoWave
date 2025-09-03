@@ -106,6 +106,8 @@ void Application::Run() {
 		sf::Time sec = clock.restart();
 		m_gui.Update(m_window, sec);
 
+		m_piano.PlayComposition();
+
 		HandlePianoKeyStrikes();
 
 		// Rendering
@@ -124,10 +126,53 @@ void Application::Run() {
 
 void Application::HandleGUI() {
 
-	ImGui::Begin("File Handling", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("Music", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 3.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
+	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
 	ImGui::SetWindowPos(ImVec2(0.f, 0.f));
+
+	ImGui::SeparatorText("Files");
+	if (ImGui::Button("Select midi")) {
+
+		nfdfilteritem_t filters[1] = { {"Midi files", "mid"}};
+		nfdresult_t result = m_nfd_handler.OpenDialog(filters, 1);
+
+		if (result == NFD_OKAY) {
+
+			m_piano.LoadMidiFile(m_nfd_handler.GetPath());
+		}
+	}
+
+	ImGui::NewLine();
+
+	ImGui::SeparatorText("Composition");
+	if (ImGui::Button("Play")) {
+
+		m_piano.StartComposition();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button(m_piano.IsCompositionPlaying() ? "Pause" : "Unpause")) {
+
+		m_piano.PauseUnpauseComposition();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Restart")) {
+
+		m_piano.RestartComposition();
+	}
+
+	ImGui::NewLine();
+
+	const ImVec4 statusColor = m_piano.IsCompositionPlaying() ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f);
+	const char* statusText = m_piano.IsCompositionPlaying() ? "Playing" : "Stopped";
+	ImGui::Text("Status:"); ImGui::SameLine(); ImGui::TextColored(statusColor, statusText);
+
+	ImGui::End();
+
+	ImGui::Begin("Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
+	ImGui::SetWindowPos(ImVec2((float)g_window_settings.width / 2.f, 0.f));
 
 	ImGui::End();
 }
