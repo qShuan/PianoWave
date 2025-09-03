@@ -2,7 +2,9 @@
 #include <print>
 
 Piano::Piano()
-	: m_sample_rate(44100),
+	: m_midi_file_duration(0),
+	m_sample_rate(44100),
+	m_composition_elapsed_time(0.f),
 	m_current_note_index(0),
 	m_is_composition_playing(false) {
 
@@ -179,6 +181,7 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 	m_is_composition_playing = false;
 	m_current_note_index = 0;
+	m_midi_file_duration = midifile.getFileDurationInSeconds();
 
 	LOG("-- File {} has been successfully loaded --", fileName);
 }
@@ -200,6 +203,8 @@ void Piano::PlayComposition() {
 
 	if (m_note_events.empty() || !m_is_composition_playing)
 		return;
+
+	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds();
 
 	if (!m_note_events[m_current_note_index].hasBeenStruck) {
 
@@ -238,6 +243,8 @@ void Piano::StartComposition() {
 		return;
 
 	m_is_composition_playing = true;
+
+	m_composition_clock.restart();
 }
 
 void Piano::PauseComposition() {

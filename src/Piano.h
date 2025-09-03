@@ -47,7 +47,12 @@ private:
 
 	std::vector<sf::Int16> m_samples;
 
+	double m_midi_file_duration;
+	sf::Clock m_composition_clock;
+
 	float m_sample_rate;
+
+	float m_composition_elapsed_time;
 
 	int m_current_note_index;
 
@@ -86,5 +91,9 @@ public:
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }
+
+	double GetMidiFileDuration() const { return m_midi_file_duration; }
+	float GetCompositionElapsedTime() const { return m_composition_elapsed_time; }
+
 	bool IsCompositionPlaying() const { return m_is_composition_playing; }
 };

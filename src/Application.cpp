@@ -167,6 +167,16 @@ void Application::HandleGUI() {
 	const char* statusText = m_piano.IsCompositionPlaying() ? "Playing" : "Stopped";
 	ImGui::Text("Status:"); ImGui::SameLine(); ImGui::TextColored(statusColor, statusText);
 
+	const double midiFileDurationInSeconds = m_piano.GetMidiFileDuration();
+	int minutes = (int)midiFileDurationInSeconds / 60;
+	int seconds = (int)midiFileDurationInSeconds % 60;
+	ImGui::Text("Time length:"); ImGui::SameLine(); ImGui::Text("%02d:%02d", minutes, seconds);
+
+	const float compositionElapsedTime = m_piano.GetCompositionElapsedTime();
+	minutes = (int)compositionElapsedTime / 60;
+	seconds = (int)compositionElapsedTime % 60;
+	ImGui::Text("Elapsed time:"); ImGui::SameLine(); ImGui::Text("%02d:%02d", minutes, seconds);
+
 	ImGui::End();
 
 	ImGui::Begin("Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
