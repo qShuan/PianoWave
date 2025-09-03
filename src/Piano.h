@@ -25,10 +25,10 @@ class Piano {
 private:
 
 	struct NoteEvent {
-		int note;
-		double duration;
-		double timeToNextNote;
-		double startTime;
+		int note = 21;
+		double duration = 0;
+		double timeToNextNote = 0;
+		double startTime = 0;
 		sf::Clock nextNoteClock;
 		sf::Clock durationClock;
 		bool hasBeenStruck = false;
@@ -36,7 +36,7 @@ private:
 
 
 	std::array<sf::SoundBuffer, g_number_of_keys> m_sound_buffers;
-	std::array<sf::Sound, g_number_of_keys> m_sound_wave_table;
+	std::vector<sf::Sound> m_sound_wave_table;
 
 	std::array<PianoKey, g_number_of_keys> m_keys;
 	std::vector<NoteEvent> m_note_events;
@@ -45,7 +45,9 @@ private:
 
 	std::vector<int> m_pressed_note_indices;
 
-	std::vector<sf::Int16> m_samples;
+	std::vector<int16_t> m_samples;
+
+	std::mutex m_sound_table_mutex;
 
 	double m_midi_file_duration;
 	sf::Clock m_composition_clock;
@@ -62,7 +64,7 @@ private:
 
 	void GenerateWaveTable();
 	void GenerateKeyWaveForm(int keyNumber, float duration);
-	std::vector<sf::Int16> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
+	std::vector<int16_t> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
 	float GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency);
 	float ADSR(float t, float duration, int keyNumber);
 	float GenerateKeyFrequency(int keyNumber);

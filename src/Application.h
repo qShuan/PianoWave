@@ -29,7 +29,7 @@ private:
 
 private:
 
-	void HandleEvents(sf::Event& event);
+	void HandleEvents(const std::optional<sf::Event>& event);
 	void HandlePianoKeyStrikes();
 	void HandleGUI();
 

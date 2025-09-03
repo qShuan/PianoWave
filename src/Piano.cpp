@@ -33,25 +33,31 @@ void Piano::GenerateWaveTable() {
 		future.get();
 	}
 	m_key_sound_futures.clear();
+
+	// Assign sounds here because multithreading breaks the order
+	m_sound_wave_table.reserve(g_number_of_keys);
+	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
+
+		m_sound_wave_table.emplace_back(m_sound_buffers[keyNumber]);
+	}
 }
 
 void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	PianoKey& key = m_keys[keyNumber];
 
-	std::vector<sf::Int16> samples = GenerateKeySamples(key, keyNumber, duration);
+	std::vector<int16_t> samples = GenerateKeySamples(key, keyNumber, duration);
 
-	m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, (unsigned int)m_sample_rate);
-	m_sound_wave_table[keyNumber].setBuffer(m_sound_buffers[keyNumber]);
+	(void)m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, (unsigned int)m_sample_rate, {sf::SoundChannel::FrontLeft, sf::SoundChannel::FrontRight});
 
 	LOG("-- Key: {} has been generated --", keyNumber);
 }
 
-std::vector<sf::Int16> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, float duration) {
+std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, float duration) {
 
 	int totalSamplesCount = (int)(m_sample_rate * duration);
 
-	std::vector<sf::Int16> samples;
+	std::vector<int16_t> samples;
 	samples.resize(totalSamplesCount);
 
 	float maxFreq = 4187.f;
@@ -88,7 +94,7 @@ std::vector<sf::Int16> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, f
 		sampleValue *= 2.f / (float)M_PI + 8.f / ((float)M_PI * (float)M_PI);
 		sampleValue *= env;
 
-		sf::Int16 sample = (sf::Int16)(32767 * 0.1f * sampleValue);
+		int16_t sample = (int16_t)(32767 * 0.1f * sampleValue);
 		samples[i] = sample;
 	}
 

@@ -19,7 +19,7 @@ public:
 
 	void Init(sf::RenderWindow& window);
 	void Update(sf::RenderWindow& window, sf::Time dt);
-	void ProcessEvent(sf::RenderWindow& window, const sf::Event& event);
+	void ProcessEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event);
 	void Render(sf::RenderWindow& window);
 	void Close();
 	void InitStyle();

@@ -13,7 +13,7 @@ GUI::GUI(sf::RenderWindow& window)
 void GUI::Init(sf::RenderWindow& window) {
 
 	LOG("-- Initializing ImGUI --");
-	ImGui::SFML::Init(window);
+	(void)ImGui::SFML::Init(window);
 }
 
 void GUI::Update(sf::RenderWindow& window, sf::Time dt) {
@@ -21,9 +21,9 @@ void GUI::Update(sf::RenderWindow& window, sf::Time dt) {
 	ImGui::SFML::Update(window, dt);
 }
 
-void GUI::ProcessEvent(sf::RenderWindow& window, const sf::Event& event) {
+void GUI::ProcessEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
 
-	ImGui::SFML::ProcessEvent(window, event);
+	ImGui::SFML::ProcessEvent(window, *event);
 }
 
 void GUI::Render(sf::RenderWindow& window) {

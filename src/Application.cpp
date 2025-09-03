@@ -1,7 +1,7 @@
 #include "Application.h"
 
 Application::Application()
-	: m_window(sf::RenderWindow(sf::VideoMode(g_window_settings.width, g_window_settings.height), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)),
+	: m_window(sf::RenderWindow(sf::VideoMode({ g_window_settings.width, g_window_settings.height }), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)),
 	m_gui(GUI(m_window)),
 	m_is_mouse_left_pressed(false),
 	m_piano_keys(m_piano.GetKeys()) {
@@ -10,28 +10,35 @@ Application::Application()
 	m_piano.SetKeyPositions((float)g_window_settings.width, (float)g_window_settings.height);
 }
 
-void Application::HandleEvents(sf::Event& event) {
+void Application::HandleEvents(const std::optional<sf::Event>& event) {
+
+	if (!event)
+		return;
 
 	m_gui.ProcessEvent(m_window, event);
 
-	if (event.type == __noop) {
+	if (event->is<sf::Event::Closed>()) {
 		m_window.close();
 	}
 
-	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+	if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
 
-		m_is_mouse_left_pressed = true;
+		if(mouseButton->button == sf::Mouse::Button::Left)
+			m_is_mouse_left_pressed = true;
 	}
-	else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+	else if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonReleased>()) {
 
-		m_is_mouse_left_pressed = false;
+		if (mouseButton->button == sf::Mouse::Button::Left) {
 
-		for (size_t i = 0; i < m_piano_keys.size(); i++) {
+			m_is_mouse_left_pressed = false;
 
-			PianoKey& key = m_piano_keys[i];
+			for (size_t i = 0; i < m_piano_keys.size(); i++) {
 
-			if (key.HasBeenStruck())
-				m_piano.ReleaseKey(key.GetMidiNote());
+				PianoKey& key = m_piano_keys[i];
+
+				if (key.HasBeenStruck())
+					m_piano.ReleaseKey(key.GetMidiNote());
+			}
 		}
 	}
 }
@@ -95,9 +102,7 @@ void Application::Run() {
 
 	while (m_window.isOpen()) {
 
-		sf::Event event;
-
-		while (m_window.pollEvent(event)) {
+		while (const std::optional event = m_window.pollEvent()) {
 
 			HandleEvents(event);
 		}
