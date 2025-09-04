@@ -148,8 +148,6 @@ void Application::HandleGUI() {
 		}
 	}
 
-	ImGui::NewLine();
-
 	ImGui::SeparatorText("Composition");
 	if (ImGui::Button("Start")) {
 
@@ -181,6 +179,14 @@ void Application::HandleGUI() {
 	minutes = (int)compositionElapsedTime / 60;
 	seconds = (int)compositionElapsedTime % 60;
 	ImGui::Text("Elapsed time:"); ImGui::SameLine(); ImGui::Text("%02d:%02d", minutes, seconds);
+
+	ImGui::NewLine();
+
+	ImGui::Text("Playback speed (restarts the composition)");
+	if (ImGui::SliderFloat("##composition_playback_speed", m_piano.GetCompositionPlaybackSpeed(), 1.f, 4.f)) {
+
+		m_piano.RestartComposition();
+	}
 
 	ImGui::End();
 

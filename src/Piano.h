@@ -52,6 +52,7 @@ private:
 	float m_sample_rate;
 
 	float m_composition_elapsed_time;
+	float m_composition_playback_speed;
 
 	bool m_is_composition_playing;
 
@@ -91,6 +92,7 @@ public:
 
 	double GetMidiFileDuration() const { return m_midi_file_duration; }
 	float GetCompositionElapsedTime() const { return m_composition_elapsed_time; }
+	float* GetCompositionPlaybackSpeed() { return &m_composition_playback_speed; }
 
 	bool IsCompositionPlaying() const { return m_is_composition_playing; }
 };

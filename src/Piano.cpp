@@ -5,6 +5,7 @@ Piano::Piano()
 	: m_midi_file_duration(0),
 	m_sample_rate(44100),
 	m_composition_elapsed_time(0.f),
+	m_composition_playback_speed(1.f),
 	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
@@ -203,7 +204,7 @@ void Piano::PlayComposition() {
 	if (m_note_events.empty() || !m_is_composition_playing)
 		return;
 
-	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds();
+	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds() * m_composition_playback_speed;
 
 	for (int i = 0; i < m_note_events.size(); i++) {
 
