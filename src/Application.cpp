@@ -1,13 +1,15 @@
 #include "Application.h"
 
 Application::Application()
-	: m_window(sf::RenderWindow(sf::VideoMode({ g_window_settings.width, g_window_settings.height }), g_window_settings.name, sf::Style::Titlebar | sf::Style::Close)),
+	: m_window(sf::RenderWindow(sf::VideoMode({ g_window_settings.width, g_window_settings.height }), g_window_settings.name, sf::Style::Default)),
 	m_gui(GUI(m_window)),
-	m_is_mouse_left_pressed(false),
-	m_piano_keys(m_piano.GetKeys()) {
+	m_piano_keys(m_piano.GetKeys()),
+	m_window_width((float)g_window_settings.width),
+	m_window_height((float)g_window_settings.height),
+	m_is_mouse_left_pressed(false) {
 
 	m_window.setKeyRepeatEnabled(false);
-	m_piano.SetKeyPositions((float)g_window_settings.width, (float)g_window_settings.height);
+	m_piano.SetKeyPositions(m_window_width, m_window_height);
 }
 
 void Application::HandleEvents(const std::optional<sf::Event>& event) {
@@ -40,6 +42,17 @@ void Application::HandleEvents(const std::optional<sf::Event>& event) {
 					m_piano.ReleaseKey(key.GetMidiNote());
 			}
 		}
+	}
+
+	if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+
+		sf::FloatRect visibleArea({ 0.f, 0.f }, sf::Vector2f(resized->size));
+		m_window.setView(sf::View(visibleArea));
+
+		m_window_width = (float)resized->size.x;
+		m_window_height = (float)resized->size.y;
+
+		m_piano.UpdateKeyPositions(m_window_width, m_window_height);
 	}
 }
 
@@ -133,7 +146,7 @@ void Application::HandleGUI() {
 
 	ImGui::Begin("Music", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
+	ImGui::SetWindowSize(ImVec2(m_window_width / 2.f, m_window_height - m_piano_keys[0].GetHeight()));
 	ImGui::SetWindowPos(ImVec2(0.f, 0.f));
 
 	ImGui::SeparatorText("Files");
@@ -188,8 +201,8 @@ void Application::HandleGUI() {
 
 	ImGui::Begin("Tools", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
-	ImGui::SetWindowPos(ImVec2((float)g_window_settings.width / 2.f, 0.f));
+	ImGui::SetWindowSize(ImVec2(m_window_width / 2.f, m_window_height - m_piano_keys[0].GetHeight()));
+	ImGui::SetWindowPos(ImVec2(m_window_width / 2.f, 0.f));
 
 	ImGui::SeparatorText("General");
 	if (ImGui::Button("Close")) {

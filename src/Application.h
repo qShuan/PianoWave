@@ -25,6 +25,9 @@ private:
 
 	NFDHandler m_nfd_handler;
 
+	float m_window_width;
+	float m_window_height;
+
 	bool m_is_mouse_left_pressed;
 
 private:
