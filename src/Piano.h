@@ -69,7 +69,7 @@ private:
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
 
-	bool IsKeyBlack(int keyNumber);
+	bool IsKeyBlack(int keyNumber) const;
 
 public:
 

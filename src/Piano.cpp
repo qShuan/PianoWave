@@ -432,7 +432,7 @@ void Piano::DrawKeys(sf::RenderWindow& window) {
 	}
 }
 
-bool Piano::IsKeyBlack(int keyNumber) {
+bool Piano::IsKeyBlack(int keyNumber) const {
 
 	int noteInOctave = keyNumber % 12;
 
