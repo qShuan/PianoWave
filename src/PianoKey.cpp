@@ -3,7 +3,7 @@
 
 PianoKey::PianoKey()
 	: m_original_color(sf::Color::White),
-	m_key_type(WHITE),
+	m_type(WHITE),
 	m_width(0.f),
 	m_height(150.f),
 	m_frequency(440),
@@ -11,12 +11,12 @@ PianoKey::PianoKey()
 	m_has_been_struck(false) {
 
 	UpdateSize();
-	SetKeyColor(m_original_color);
+	SetColor(m_original_color);
 }
 
 PianoKey::PianoKey(float frequency, int midiNote, KeyType keyType, sf::Color color)
 	: m_original_color(color),
-	m_key_type(keyType),
+	m_type(keyType),
 	m_width(0.f),
 	m_height(150.f),
 	m_frequency(frequency),
@@ -24,34 +24,34 @@ PianoKey::PianoKey(float frequency, int midiNote, KeyType keyType, sf::Color col
 	m_has_been_struck(false) {
 
 	UpdateSize();
-	SetKeyColor(m_original_color);
+	SetColor(m_original_color);
 }
 
 void PianoKey::UpdateSize() {
 
-	m_key_shape.setSize({ m_width, m_height });
+	m_shape.setSize({ m_width, m_height });
 }
 
-void PianoKey::SetKeyPosition(const sf::Vector2f& position) {
+void PianoKey::SetPosition(const sf::Vector2f& position) {
 
-	m_key_shape.setPosition(position);
+	m_shape.setPosition(position);
 }
 
-void PianoKey::SetKeyHeight(float height) {
+void PianoKey::SetHeight(float height) {
 	
 	m_height = height;
 	UpdateSize();
 }
 
-void PianoKey::SetKeyWidth(float width) {
+void PianoKey::SetWidth(float width) {
 
 	m_width = width;
 	UpdateSize();
 }
 
-void PianoKey::SetKeyColor(const sf::Color& color) {
+void PianoKey::SetColor(const sf::Color& color) {
 
-	m_key_shape.setFillColor(color);
+	m_shape.setFillColor(color);
 }
 
 void PianoKey::SetStruck(bool hasBeenStruck) {
@@ -61,11 +61,11 @@ void PianoKey::SetStruck(bool hasBeenStruck) {
 
 void PianoKey::Draw(sf::RenderWindow& window) {
 
-	window.draw(m_key_shape);
+	window.draw(m_shape);
 }
 
 bool PianoKey::IsPointInsideBounds(const sf::Vector2f& point) {
 
-	return (point.x >= m_key_shape.getPosition().x && point.x <= (m_key_shape.getPosition().x + m_width)
-		&& point.y >= m_key_shape.getPosition().y && point.y <= (m_key_shape.getPosition().y + m_height));
+	return (point.x >= m_shape.getPosition().x && point.x <= (m_shape.getPosition().x + m_width)
+		&& point.y >= m_shape.getPosition().y && point.y <= (m_shape.getPosition().y + m_height));
 }

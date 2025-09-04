@@ -20,20 +20,20 @@
 
 constexpr size_t g_number_of_keys = 88;
 
+struct NoteEvent {
+
+	int note = 21;
+	double duration = 0;
+	double startTime = 0;
+	bool hasBeenStruck = false;
+};
+
 class Piano {
 
 private:
 
-	struct NoteEvent {
-		int note = 21;
-		double duration = 0;
-		double startTime = 0;
-		bool hasBeenStruck = false;
-	};
-
-
 	std::array<sf::SoundBuffer, g_number_of_keys> m_sound_buffers;
-	std::vector<sf::Sound> m_sound_wave_table;
+	std::vector<sf::Sound> m_sounds;
 
 	std::array<PianoKey, g_number_of_keys> m_keys;
 	std::vector<NoteEvent> m_note_events;
@@ -44,9 +44,10 @@ private:
 
 	std::vector<int16_t> m_samples;
 
-	std::mutex m_sound_table_mutex;
+	std::mutex m_sounds_mutex;
 
 	double m_midi_file_duration;
+
 	sf::Clock m_composition_clock;
 
 	float m_sample_rate;
@@ -60,7 +61,7 @@ private:
 
 private:
 
-	void GenerateWaveTable();
+	void GenerateKeySounds();
 	void GenerateKeyWaveForm(int keyNumber, float duration);
 	std::vector<int16_t> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
 	float GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency);

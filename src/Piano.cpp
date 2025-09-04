@@ -10,12 +10,12 @@ Piano::Piano()
 	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
-	GenerateWaveTable();
+	GenerateKeySounds();
 
 	LOG("-- Piano has been initialized --");
 }
 
-void Piano::GenerateWaveTable() {
+void Piano::GenerateKeySounds() {
 
 	LOG("-- Generating key waveforms --");
 
@@ -36,10 +36,10 @@ void Piano::GenerateWaveTable() {
 	m_key_sound_futures.clear();
 
 	// Assign sounds here because multithreading breaks the order
-	m_sound_wave_table.reserve(g_number_of_keys);
+	m_sounds.reserve(g_number_of_keys);
 	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
 
-		m_sound_wave_table.emplace_back(m_sound_buffers[keyNumber]);
+		m_sounds.emplace_back(m_sound_buffers[keyNumber]);
 	}
 }
 
@@ -193,14 +193,14 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 void Piano::StrikeKey(int keyNumber) {
 
-	m_sound_wave_table[keyNumber - 21].play();
-	m_keys[keyNumber - 21].SetKeyColor(g_pressed_key_color);
+	m_sounds[keyNumber - 21].play();
+	m_keys[keyNumber - 21].SetColor(g_pressed_key_color);
 	m_keys[keyNumber - 21].SetStruck(true);
 }
 
 void Piano::ReleaseKey(int keyNumber) {
 
-	m_keys[keyNumber - 21].SetKeyColor(m_keys[keyNumber - 21].GetOriginalColor());
+	m_keys[keyNumber - 21].SetColor(m_keys[keyNumber - 21].GetOriginalColor());
 	m_keys[keyNumber - 21].SetStruck(false);
 }
 
@@ -369,7 +369,7 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 		if (!IsKeyBlack(i + 21))
 			continue;
 
-		m_keys[i].SetKeyHeight(m_keys[i].GetHeight() * 0.6f);
+		m_keys[i].SetHeight(m_keys[i].GetHeight() * 0.6f);
 	}
 }
 
@@ -391,8 +391,8 @@ void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
 			continue;
 
 		sf::Vector2f position = { keyIndex * (keyWidth + gap), windowHeight - m_keys[i].GetHeight() };
-		m_keys[i].SetKeyPosition(position);
-		m_keys[i].SetKeyWidth(keyWidth);
+		m_keys[i].SetPosition(position);
+		m_keys[i].SetWidth(keyWidth);
 
 		keyIndex++;
 	}
@@ -403,17 +403,17 @@ void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
 		if (!IsKeyBlack(i + 21))
 			continue;
 
-		m_keys[i].SetKeyWidth(keyWidth * 0.5f);
-		sf::Vector2f position = { (m_keys[i - 1].GetKeyPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f + gap / 2.f), m_keys[i - 1].GetKeyPosition().y };
-		m_keys[i].SetKeyPosition(position);
+		m_keys[i].SetWidth(keyWidth * 0.5f);
+		sf::Vector2f position = { (m_keys[i - 1].GetPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f + gap / 2.f), m_keys[i - 1].GetPosition().y };
+		m_keys[i].SetPosition(position);
 	}
 }
 
 void Piano::UpdateVolume() {
 
-	for (size_t i = 0; i < m_sound_wave_table.size(); i++) {
+	for (size_t i = 0; i < m_sounds.size(); i++) {
 
-		m_sound_wave_table[i].setVolume(m_volume);
+		m_sounds[i].setVolume(m_volume);
 	}
 }
 
