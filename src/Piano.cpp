@@ -175,6 +175,10 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 				n.startTime = midifile[track][event].seconds;
 				n.duration = midifile[track][event].getDurationInSeconds();
 
+				// Clamp the duration (prevents key presses not being visible)
+				if (n.duration < 0.1)
+					n.duration = 0.1;
+
 				m_note_events.emplace_back(n);
 			}
 		}
