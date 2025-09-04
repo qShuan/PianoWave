@@ -5,7 +5,6 @@ Piano::Piano()
 	: m_midi_file_duration(0),
 	m_sample_rate(44100),
 	m_composition_elapsed_time(0.f),
-	m_current_note_index(0),
 	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
@@ -143,6 +142,7 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	LOG("-- Loading file: {} --", fileName);
 
 	m_note_events.clear();
+	m_pressed_note_indices.clear();
 
 	std::ifstream file(fileName, std::ios::binary);
 
@@ -173,20 +173,13 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 				n.note = midifile[track][event].getKeyNumber();
 				n.startTime = midifile[track][event].seconds;
 				n.duration = midifile[track][event].getDurationInSeconds();
-				n.timeToNextNote = 0.f;
 
 				m_note_events.emplace_back(n);
 			}
 		}
 	}
 
-	for (size_t i = 0; i + 1 < m_note_events.size(); i++) {
-
-		m_note_events[i].timeToNextNote = m_note_events[i + 1].startTime - m_note_events[i].startTime;
-	}
-
 	m_is_composition_playing = false;
-	m_current_note_index = 0;
 	m_midi_file_duration = midifile.getFileDurationInSeconds();
 
 	LOG("-- File {} has been successfully loaded --", fileName);
@@ -212,22 +205,16 @@ void Piano::PlayComposition() {
 
 	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds();
 
-	if (!m_note_events[m_current_note_index].hasBeenStruck) {
+	for (int i = 0; i < m_note_events.size(); i++) {
 
-		StrikeKey(m_note_events[m_current_note_index].note);
-		m_note_events[m_current_note_index].nextNoteClock.restart();
-		m_note_events[m_current_note_index].durationClock.restart();
+		if (m_composition_elapsed_time >= m_note_events[i].startTime && !m_note_events[i].hasBeenStruck) {
 
-		// Save the note index
-		m_pressed_note_indices.emplace_back(m_current_note_index);
+			StrikeKey(m_note_events[i].note);
 
-		m_note_events[m_current_note_index].hasBeenStruck = true;
-	}
-
-	if (m_note_events[m_current_note_index].nextNoteClock.getElapsedTime().asSeconds() >= m_note_events[m_current_note_index].timeToNextNote) {
-
-		m_note_events[m_current_note_index].hasBeenStruck = false;
-		m_current_note_index++;
+			// Save the note index
+			m_pressed_note_indices.emplace_back(i);
+			m_note_events[i].hasBeenStruck = true;
+		}
 	}
 
 	// Release all keys that have been held for their full duration
@@ -235,22 +222,39 @@ void Piano::PlayComposition() {
 
 		int noteIndex = m_pressed_note_indices[i];
 
-		if (m_note_events[noteIndex].durationClock.getElapsedTime().asSeconds() >= m_note_events[noteIndex].duration) {
+		if (m_composition_elapsed_time >= m_note_events[noteIndex].startTime + m_note_events[noteIndex].duration) {
 
 			ReleaseKey(m_note_events[noteIndex].note);
 			m_pressed_note_indices.erase(m_pressed_note_indices.begin() + i);
 		}
 	}
+
+	if (m_composition_elapsed_time >= m_midi_file_duration) {
+
+		m_is_composition_playing = false;
+	}
 }
 
 void Piano::StartComposition() {
 
-	if (m_note_events.empty())
+	if (m_note_events.empty() || m_is_composition_playing)
 		return;
 
-	m_is_composition_playing = true;
+	if (m_composition_clock.isRunning()) {
 
-	m_composition_clock.restart();
+		m_composition_clock.restart();
+
+		for (size_t i = 0; i < m_note_events.size(); i++) {
+
+			m_note_events[i].hasBeenStruck = false;
+		}
+	}
+	else {
+
+		m_composition_clock.start();
+	}
+
+	m_is_composition_playing = true;
 }
 
 void Piano::PauseComposition() {
@@ -259,6 +263,7 @@ void Piano::PauseComposition() {
 		return;
 
 	m_is_composition_playing = false;
+	m_composition_clock.stop();
 }
 
 void Piano::RestartComposition() {
@@ -266,7 +271,17 @@ void Piano::RestartComposition() {
 	if (m_note_events.empty())
 		return;
 
-	m_current_note_index = 0;
+	m_composition_elapsed_time = 0;
+	m_composition_clock.restart();
+
+	for (size_t i = 0; i < m_note_events.size(); i++) {
+
+		m_note_events[i].hasBeenStruck = false;
+	}
+
+	m_pressed_note_indices.clear();
+
+	m_is_composition_playing = true;
 }
 
 float Piano::ADSR(float t, float duration, int keyNumber) {

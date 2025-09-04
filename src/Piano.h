@@ -27,10 +27,7 @@ private:
 	struct NoteEvent {
 		int note = 21;
 		double duration = 0;
-		double timeToNextNote = 0;
 		double startTime = 0;
-		sf::Clock nextNoteClock;
-		sf::Clock durationClock;
 		bool hasBeenStruck = false;
 	};
 
@@ -55,8 +52,6 @@ private:
 	float m_sample_rate;
 
 	float m_composition_elapsed_time;
-
-	int m_current_note_index;
 
 	bool m_is_composition_playing;
 
