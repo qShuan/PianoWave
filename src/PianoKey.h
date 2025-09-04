@@ -41,15 +41,15 @@ public:
 	void SetColor(const sf::Color& color);
 	void SetStruck(bool hasBeenStruck);
 
-	sf::Vector2f GetPosition() { return m_shape.getPosition(); }
+	sf::Vector2f GetPosition() const { return m_shape.getPosition(); }
 	sf::RectangleShape& GetShape() { return m_shape; }
-	float& GetFrequency() { return m_frequency; }
-	float& GetWidth() { return m_width; }
-	float& GetHeight() { return m_height; }
+	float GetFrequency() const { return m_frequency; }
+	float GetWidth() const { return m_width; }
+	float GetHeight() const { return m_height; }
 	sf::Color& GetOriginalColor() { return m_original_color; }
-	int& GetMidiNote() { return m_midi_note; }
+	int GetMidiNote() const { return m_midi_note; }
 
-	bool& HasBeenStruck() { return m_has_been_struck; }
+	bool HasBeenStruck() const { return m_has_been_struck; }
 	bool IsBlack() const { return m_type == BLACK; }
 	bool IsPointInsideBounds(const sf::Vector2f& point);
 };
