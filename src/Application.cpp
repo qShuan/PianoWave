@@ -148,6 +148,8 @@ void Application::HandleGUI() {
 		}
 	}
 
+	ImGui::Text("File: %s", m_nfd_handler.GetPath() == nullptr ? "not selected" : m_nfd_handler.GetPath());
+
 	ImGui::SeparatorText("Composition");
 	if (ImGui::Button("Start")) {
 
