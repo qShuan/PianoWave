@@ -54,6 +54,8 @@ private:
 	float m_composition_elapsed_time;
 	float m_composition_playback_speed;
 
+	float m_volume;
+
 	bool m_is_composition_playing;
 
 private:
@@ -86,6 +88,7 @@ public:
 	void LoadMidiFile(const std::string& fileName);
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
+	void UpdateVolume();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }
@@ -93,6 +96,7 @@ public:
 	double GetMidiFileDuration() const { return m_midi_file_duration; }
 	float GetCompositionElapsedTime() const { return m_composition_elapsed_time; }
 	float* GetCompositionPlaybackSpeed() { return &m_composition_playback_speed; }
+	float* GetVolume() { return &m_volume; }
 
 	bool IsCompositionPlaying() const { return m_is_composition_playing; }
 };

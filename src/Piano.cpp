@@ -6,6 +6,7 @@ Piano::Piano()
 	m_sample_rate(44100),
 	m_composition_elapsed_time(0.f),
 	m_composition_playback_speed(1.f),
+	m_volume(100.f),
 	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
@@ -385,6 +386,14 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 		sf::Vector2f position = { (m_keys[i - 1].GetKeyPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f), m_keys[i - 1].GetKeyPosition().y };
 		m_keys[i].SetKeyPosition(position);
 		m_keys[i].SetKeyHeight(m_keys[i].GetHeight() * 0.6f);
+	}
+}
+
+void Piano::UpdateVolume() {
+
+	for (size_t i = 0; i < m_sound_wave_table.size(); i++) {
+
+		m_sound_wave_table[i].setVolume(m_volume);
 	}
 }
 

@@ -172,6 +172,8 @@ void Application::HandleGUI() {
 	const char* statusText = m_piano.IsCompositionPlaying() ? "Playing" : "Stopped";
 	ImGui::Text("Status:"); ImGui::SameLine(); ImGui::TextColored(statusColor, statusText);
 
+	ImGui::NewLine();
+
 	const double midiFileDurationInSeconds = m_piano.GetMidiFileDuration();
 	int minutes = (int)midiFileDurationInSeconds / 60;
 	int seconds = (int)midiFileDurationInSeconds % 60;
@@ -202,6 +204,14 @@ void Application::HandleGUI() {
 	if (ImGui::SliderFloat("##composition_playback_speed", m_piano.GetCompositionPlaybackSpeed(), 1.f, 4.f)) {
 
 		m_piano.RestartComposition();
+	}
+
+	ImGui::NewLine();
+
+	ImGui::Text("Volume");
+	if (ImGui::SliderFloat("##volume", m_piano.GetVolume(), 0.f, 100.f)) {
+
+		m_piano.UpdateVolume();
 	}
 
 	ImGui::End();
