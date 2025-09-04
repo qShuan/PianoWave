@@ -182,20 +182,27 @@ void Application::HandleGUI() {
 	seconds = (int)compositionElapsedTime % 60;
 	ImGui::Text("Elapsed time:"); ImGui::SameLine(); ImGui::Text("%02d:%02d", minutes, seconds);
 
+	ImGui::End();
+
+	ImGui::Begin("Tools", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
+	ImGui::SetWindowPos(ImVec2((float)g_window_settings.width / 2.f, 0.f));
+
+	ImGui::SeparatorText("General");
+	if (ImGui::Button("Close")) {
+
+		m_window.close();
+	}
+
 	ImGui::NewLine();
 
+	ImGui::SeparatorText("Controls");
 	ImGui::Text("Playback speed (restarts the composition)");
 	if (ImGui::SliderFloat("##composition_playback_speed", m_piano.GetCompositionPlaybackSpeed(), 1.f, 4.f)) {
 
 		m_piano.RestartComposition();
 	}
-
-	ImGui::End();
-
-	ImGui::Begin("Information", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-
-	ImGui::SetWindowSize(ImVec2((float)g_window_settings.width / 2.f, (float)g_window_settings.height - m_piano_keys[0].GetHeight()));
-	ImGui::SetWindowPos(ImVec2((float)g_window_settings.width / 2.f, 0.f));
 
 	ImGui::End();
 }
