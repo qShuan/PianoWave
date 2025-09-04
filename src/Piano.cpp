@@ -404,7 +404,7 @@ void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
 			continue;
 
 		m_keys[i].SetKeyWidth(keyWidth * 0.5f);
-		sf::Vector2f position = { (m_keys[i - 1].GetKeyPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f), m_keys[i - 1].GetKeyPosition().y };
+		sf::Vector2f position = { (m_keys[i - 1].GetKeyPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f + gap / 2.f), m_keys[i - 1].GetKeyPosition().y };
 		m_keys[i].SetKeyPosition(position);
 	}
 }
