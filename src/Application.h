@@ -5,28 +5,24 @@
 struct WindowSettings {
 
 	const char* name = "Piano Wave";
-	const unsigned int width = 1080;
-	const unsigned int height = 420;
+	unsigned int width = 1080;
+	unsigned int height = 420;
 };
 
-const WindowSettings g_window_settings;
 
 class Application {
 
 private:
 
-	sf::RenderWindow m_window;
-
-	GUI m_gui;
-
 	Piano m_piano;
-
 	std::array<PianoKey, g_number_of_keys>& m_piano_keys;
+
+	WindowSettings m_window_settings;
+	sf::RenderWindow m_window;
 
 	NFDHandler m_nfd_handler;
 
-	float m_window_width;
-	float m_window_height;
+	GUI m_gui;
 
 	bool m_is_mouse_left_pressed;
 
