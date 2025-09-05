@@ -74,6 +74,8 @@ To compile and run this project, make sure you have:
 
 [Midifile](https://github.com/craigsapp/midifile)
 
+[Native File Dialog](https://github.com/btzy/nativefiledialog-extended)
+
 ---
 
 [Tuning](https://www.ub.edu/pde/tomas.sanz.perela/static/assets/papers/GraciaSanz-pianotuning.pdf)
