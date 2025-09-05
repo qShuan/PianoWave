@@ -82,6 +82,8 @@ To compile and run this project, make sure you have:
 
 [The Math Behind Music and Sound Synthesis](https://www.youtube.com/watch?v=Y7TesKMSE74)
 
+[Making Music With Math](https://aatishb.com/stringmath/)
+
 [Key Frequencies](https://en.wikipedia.org/wiki/Piano_key_frequencies)
 
 [Sound Generation](https://www.youtube.com/watch?v=5xd9BMxoXqo)
