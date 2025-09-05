@@ -17,6 +17,8 @@ A C++ piano "synthesizer" application
 
 A piano application that allows you to play MIDI (.mid) music using synthesized sounds.
 
+<img width="1075" height="413" alt="image" src="https://github.com/user-attachments/assets/ce5bf0d0-6817-415b-af14-3bcd3b9b3cc1" />
+
 ---
 
 ## Features
