@@ -76,11 +76,10 @@ std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, flo
 		// A hammer strike effect
 		if (t < 0.1f) {
 
-			hammerStrikeEffectValue += utils::rng::FastRandom() * exp(-t * 1000.f);
-
 			for (int ot = maxOvertones / 2; ot <= maxOvertones; ot++) {
+
 				float overtoneFrequency = key.GetFrequency() * ot;
-				hammerStrikeEffectValue += 1.6f * cos(0.2f * (float)M_PI * overtoneFrequency * t) * exp(-t * 1000.f);
+				hammerStrikeEffectValue += 2.f * cos(0.1f * (float)M_PI * overtoneFrequency * t) * exp(-t * 1000.f);
 			}
 		}
 
