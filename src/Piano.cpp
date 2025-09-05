@@ -43,6 +43,7 @@ void Piano::GenerateKeySounds() {
 	}
 }
 
+// A sound for each key
 void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	PianoKey& key = m_keys[keyNumber];
@@ -164,10 +165,11 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 	int tracks = midifile.getTrackCount();
 
+	// Get all the necessary information
 	for (int track = 0; track < tracks; track++) {
-
 		for (int event = 0; event < midifile[track].size(); event++) {
 
+			// Save the note event
 			if (midifile[track][event].isNoteOn()) {
 
 				NoteEvent n;
@@ -190,6 +192,7 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	LOG("-- File {} has been successfully loaded --", fileName);
 }
 
+// TODO: Create a new sound and place it in a vector, every frame check if the sound has stopped playing, if it has, remove it
 void Piano::StrikeKey(int keyNumber) {
 
 	m_sounds[keyNumber - 21].play();
@@ -203,6 +206,7 @@ void Piano::ReleaseKey(int keyNumber) {
 	m_keys[keyNumber - 21].SetStruck(false);
 }
 
+// Play the loaded .mid file
 void Piano::PlayComposition() {
 
 	if (m_note_events.empty() || !m_is_composition_playing)
@@ -210,6 +214,7 @@ void Piano::PlayComposition() {
 
 	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds() * m_composition_playback_speed;
 
+	// Strike every note that has not been struck and the composition's elapsed time has surpassed it's start time
 	for (int i = 0; i < m_note_events.size(); i++) {
 
 		if (m_composition_elapsed_time >= m_note_events[i].startTime && !m_note_events[i].hasBeenStruck) {
@@ -218,6 +223,7 @@ void Piano::PlayComposition() {
 
 			// Save the note index
 			m_pressed_note_indices.emplace_back(i);
+
 			m_note_events[i].hasBeenStruck = true;
 		}
 	}
@@ -234,6 +240,7 @@ void Piano::PlayComposition() {
 		}
 	}
 
+	// If the composition has finished, stop playing
 	if (m_composition_elapsed_time >= m_midi_file_duration) {
 
 		m_is_composition_playing = false;
@@ -245,6 +252,7 @@ void Piano::StartComposition() {
 	if (m_note_events.empty() || m_is_composition_playing)
 		return;
 
+	// If the clock has not been paused, restart, otherwise resume
 	if (m_composition_clock.isRunning()) {
 
 		m_composition_clock.restart();
@@ -289,6 +297,7 @@ void Piano::RestartComposition() {
 	m_is_composition_playing = true;
 }
 
+// The ADSR envelope
 float Piano::ADSR(float t, float duration, int keyNumber) {
 
 	float sustainLevel = 0.7f;
@@ -351,6 +360,8 @@ void Piano::GenerateKeyFrequencies() {
 			IsKeyBlack(i + 21) ? sf::Color::Black : sf::Color::White);
 	}
 }
+
+// Place the keys in correct positions
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 	UpdateKeyPositions(windowWidth, windowHeight);

@@ -64,6 +64,7 @@ void PianoKey::Draw(sf::RenderWindow& window) {
 	window.draw(m_shape);
 }
 
+// Used for checking whether we are hovering over a key
 bool PianoKey::IsPointInsideBounds(const sf::Vector2f& point) {
 
 	return (point.x >= m_shape.getPosition().x && point.x <= (m_shape.getPosition().x + m_width)
