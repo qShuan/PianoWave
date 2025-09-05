@@ -1,3 +1,7 @@
 #include <print>
+#include <string.h>
 
-#define LOG(...) std::println(__VA_ARGS__)
+// Thanks to https://stackoverflow.com/questions/8487986/file-macro-shows-full-path
+#define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+
+#define LOG(format, ...) std::println("{}: " format, __FILENAME__, __VA_ARGS__)

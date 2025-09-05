@@ -12,7 +12,7 @@ GUI::GUI(sf::RenderWindow& window)
 
 void GUI::Init(sf::RenderWindow& window) {
 
-	LOG("-- Initializing ImGUI --");
+	LOG("Initializing ImGUI");
 	(void)ImGui::SFML::Init(window);
 }
 
@@ -33,7 +33,7 @@ void GUI::Render(sf::RenderWindow& window) {
 
 void GUI::Close() {
 
-	LOG("-- Closing ImGUI --");
+	LOG("Closing ImGUI");
 	ImGui::SFML::Shutdown();
 }
 

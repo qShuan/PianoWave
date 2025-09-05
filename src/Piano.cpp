@@ -12,23 +12,23 @@ Piano::Piano()
 	GenerateKeyFrequencies();
 	GenerateKeySounds();
 
-	LOG("-- Piano has been initialized --");
+	LOG("Piano has been initialized");
 }
 
 void Piano::GenerateKeySounds() {
 
-	LOG("-- Generating key waveforms --");
+	LOG("Generating key waveforms");
 
 	float duration = 3.f;
 
-	LOG("-- Creating threads --");
+	LOG("Creating threads");
 	// Generate samples for each key
 	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
 
 		m_key_sound_futures.emplace_back(std::async(std::launch::async, &Piano::GenerateKeyWaveForm, this, keyNumber, duration));
 	}
 
-	LOG("-- Waiting for threads to finish --");
+	LOG("Waiting for threads to finish");
 	// Wait for all threads to finish before using the buffers
 	for (auto& future : m_key_sound_futures) {
 		future.get();
@@ -52,7 +52,7 @@ void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	(void)m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, (unsigned int)m_sample_rate, {sf::SoundChannel::FrontLeft, sf::SoundChannel::FrontRight});
 
-	LOG("-- Key: {} has been generated --", keyNumber);
+	LOG("Key: {} has been generated", keyNumber);
 }
 
 std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, float duration) {
@@ -141,7 +141,7 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 
 void Piano::LoadMidiFile(const std::string& fileName) {
 
-	LOG("-- Loading file: {} --", fileName);
+	LOG("Loading file: {}", fileName);
 
 	m_note_events.clear();
 	m_pressed_note_indices.clear();
@@ -149,14 +149,14 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	std::ifstream file(fileName, std::ios::binary);
 
 	if (!file.is_open()) {
-		LOG("-- File {} couldn't be loaded --", fileName);
+		LOG("File {} couldn't be loaded", fileName);
 		return;
 	}
 
 	smf::MidiFile midifile;
 
 	if (!midifile.read(file)) {
-		LOG("-- Midifile {} couldn't be loaded --", fileName);
+		LOG("Midifile {} couldn't be loaded", fileName);
 		return;
 	}
 
@@ -189,7 +189,7 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	m_is_composition_playing = false;
 	m_midi_file_duration = midifile.getFileDurationInSeconds();
 
-	LOG("-- File {} has been successfully loaded --", fileName);
+	LOG("File {} has been successfully loaded", fileName);
 }
 
 // TODO: Create a new sound and place it in a vector, every frame check if the sound has stopped playing, if it has, remove it
@@ -349,7 +349,7 @@ float Piano::GenerateKeyFrequency(int keyNumber) {
 
 void Piano::GenerateKeyFrequencies() {
 
-	LOG("-- Generating key frequencies --");
+	LOG("Generating key frequencies");
 
 	for (int i = 0; i < g_number_of_keys; i++) {
 

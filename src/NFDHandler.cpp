@@ -6,15 +6,15 @@ nfdresult_t NFDHandler::OpenDialog(nfdfilteritem_t* filters, nfdfiltersize_t fil
 
     if (result == NFD_OKAY) {
         
-        LOG("NFDHandler: Dialog opened successfully");
+        LOG("Dialog opened successfully");
     }
     else if (result == NFD_CANCEL) {
         
-        LOG("NFDHandler: User cancelled");
+        LOG("User cancelled");
     }
     else {
         
-        LOG("NFDHandler: Error - {}", NFD::GetError());
+        LOG("Error - {}", NFD::GetError());
     }
 
     return result;
