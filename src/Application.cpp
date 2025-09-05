@@ -50,7 +50,7 @@ void Application::HandleEvents(const std::optional<sf::Event>& event) {
 		m_window_settings.width = resized->size.x;
 		m_window_settings.height = resized->size.y;
 
-		m_piano.UpdateKeyPositions((float)m_window_settings.width, (float)m_window_settings.height);
+		m_piano.SetKeyPositions((float)m_window_settings.width, (float)m_window_settings.height);
 	}
 }
 

@@ -89,7 +89,6 @@ public:
 	void LoadMidiFile(const std::string& fileName);
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
-	void UpdateKeyPositions(float windowWidth, float windowHeight);
 	void UpdateVolume();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }

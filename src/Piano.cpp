@@ -364,27 +364,6 @@ void Piano::GenerateKeyFrequencies() {
 // Place the keys in correct positions
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
-	UpdateKeyPositions(windowWidth, windowHeight);
-
-	float gap = 2.f;
-	int numWhiteKeys = 52;
-
-	float totalGapWidth = (numWhiteKeys - 1) * gap;
-	float totalKeyWidth = windowWidth - totalGapWidth;
-	float keyWidth = totalKeyWidth / numWhiteKeys;
-
-	// Set the height for black keys
-	for (int i = 0; i < g_number_of_keys; i++) {
-
-		if (!IsKeyBlack(i + 21))
-			continue;
-
-		m_keys[i].SetHeight(m_keys[i].GetHeight() * 0.6f);
-	}
-}
-
-void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
-
 	float gap = 2.f;
 	int numWhiteKeys = 52;
 	int numBlackKeys = 36;
@@ -400,6 +379,7 @@ void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
 		if (IsKeyBlack(i + 21))
 			continue;
 
+		m_keys[i].SetHeight(windowHeight / 3.f);
 		sf::Vector2f position = { keyIndex * (keyWidth + gap), windowHeight - m_keys[i].GetHeight() };
 		m_keys[i].SetPosition(position);
 		m_keys[i].SetWidth(keyWidth);
@@ -413,6 +393,7 @@ void Piano::UpdateKeyPositions(float windowWidth, float windowHeight) {
 		if (!IsKeyBlack(i + 21))
 			continue;
 
+		m_keys[i].SetHeight(m_keys[i - 1].GetHeight() * 0.6f);
 		m_keys[i].SetWidth(keyWidth * 0.5f);
 		sf::Vector2f position = { (m_keys[i - 1].GetPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f + gap / 2.f), m_keys[i - 1].GetPosition().y };
 		m_keys[i].SetPosition(position);
