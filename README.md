@@ -8,6 +8,7 @@ A C++ piano "synthesizer" application made with SFML.
 - [Prerequisites](#prerequisites)
 - [Building & Running](#building--running)
 - [Resources](#resources)
+- [References](#references)
 - [License](#license)  
 - [Contact](#contact)
   
@@ -79,6 +80,8 @@ To compile and run this project, make sure you have:
 [Native File Dialog](https://github.com/btzy/nativefiledialog-extended)
 
 ---
+
+## References
 
 [Tuning](https://www.ub.edu/pde/tomas.sanz.perela/static/assets/papers/GraciaSanz-pianotuning.pdf)
 
