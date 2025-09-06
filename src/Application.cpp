@@ -217,6 +217,7 @@ void Application::HandleGUI() {
 	if (ImGui::SliderFloat("##composition_playback_speed", m_piano.GetCompositionPlaybackSpeed(), 1.f, 4.f)) {
 
 		m_piano.RestartComposition();
+		m_piano.PauseComposition();
 	}
 
 	ImGui::NewLine();

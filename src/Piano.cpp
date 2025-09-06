@@ -298,6 +298,11 @@ void Piano::RestartComposition() {
 		m_note_events[i].hasBeenStruck = false;
 	}
 
+	for (size_t i = 0; i < m_keys.size(); i++) {
+
+		ReleaseKey(m_keys[i].GetMidiNote());
+	}
+
 	m_pressed_note_indices.clear();
 
 	m_is_composition_playing = true;
