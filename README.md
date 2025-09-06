@@ -1,5 +1,5 @@
 # PianoWave
-A C++ piano "synthesizer" application
+A C++ piano "synthesizer" application made with SFML.
 
 ##  Table of Contents
 
