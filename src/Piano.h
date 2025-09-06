@@ -93,6 +93,7 @@ public:
 	void UpdateVolume();
 
 	void ClearSounds();
+	void StopAllSounds();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }

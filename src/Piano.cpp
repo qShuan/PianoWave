@@ -436,6 +436,14 @@ void Piano::ClearSounds() {
 	}
 }
 
+void Piano::StopAllSounds() {
+
+	for (auto& sound : m_sounds) {
+
+		sound.stop();
+	}
+}
+
 void Piano::DrawKeys(sf::RenderWindow& window) {
 
 	for (int i = 0; i < g_number_of_keys; i++) {

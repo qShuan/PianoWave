@@ -18,6 +18,8 @@ void Application::HandleEvents(const std::optional<sf::Event>& event) {
 	m_gui.ProcessEvent(m_window, event);
 
 	if (event->is<sf::Event::Closed>()) {
+
+		m_piano.StopAllSounds();
 		m_window.close();
 	}
 
@@ -207,6 +209,7 @@ void Application::HandleGUI() {
 	ImGui::SeparatorText("General");
 	if (ImGui::Button("Close")) {
 
+		m_piano.StopAllSounds();
 		m_window.close();
 	}
 
