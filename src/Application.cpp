@@ -23,12 +23,12 @@ void Application::HandleEvents(const std::optional<sf::Event>& event) {
 
 	if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
 
-		if(mouseButton->button == sf::Mouse::Button::Left && !m_piano.IsCompositionPlaying())
+		if(mouseButton->button == sf::Mouse::Button::Left && !m_piano.IsCompositionPlaying() && !ImGui::GetIO().WantCaptureMouse)
 			m_is_mouse_left_pressed = true;
 	}
 	else if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonReleased>()) {
 
-		if (mouseButton->button == sf::Mouse::Button::Left && !m_piano.IsCompositionPlaying()) {
+		if (mouseButton->button == sf::Mouse::Button::Left && !m_piano.IsCompositionPlaying() && !ImGui::GetIO().WantCaptureMouse) {
 
 			m_is_mouse_left_pressed = false;
 
