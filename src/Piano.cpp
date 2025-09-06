@@ -63,6 +63,9 @@ std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, flo
 
 	int maxOvertones = std::min(10, (int)(m_sample_rate / (2 * key.GetFrequency())));
 
+	float maxAmplitude = 32767.f;
+	float amplitudeMultiplier = 0.1f;
+
 	for (int i = 0; i < totalSamplesCount; i++) {
 
 		float t = (float)i / (m_sample_rate);
@@ -91,7 +94,7 @@ std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, flo
 		sampleValue *= 2.f / (float)M_PI + 8.f / ((float)M_PI * (float)M_PI);
 		sampleValue *= env;
 
-		int16_t sample = (int16_t)(32767 * 0.1f * sampleValue);
+		int16_t sample = (int16_t)(maxAmplitude * amplitudeMultiplier * sampleValue);
 		samples[i] = sample;
 	}
 
@@ -105,6 +108,9 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 
 	float overtonesValue = 0.f;
 
+	float maxDecay = 3.f;
+	float minBrightnessBoost = 0.5f;
+
 	for (int ot = 1; ot <= maxOvertones; ot++) {
 
 		float sign = (ot % 2 == 0 ? 1.f : -1.f);
@@ -112,10 +118,10 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 		float overtoneFrequency = key.GetFrequency() * ot;
 
 		//The higher the note, the faster it decays
-		decayFactor += (3.f - decayFactor) * normalizedFrequency;
+		decayFactor += (maxDecay - decayFactor) * normalizedFrequency;
 
 		// The higher the note, the more quiet it becomes
-		brightnessBoost += (0.5f - brightnessBoost) * normalizedFrequency;
+		brightnessBoost += (minBrightnessBoost - brightnessBoost) * normalizedFrequency;
 
 		// Sawtooth wave
 		overtonesValue += brightnessBoost * (
@@ -129,7 +135,8 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 
 		// Detuning
 		float detune = 1.002f;
-		overtonesValue += 0.02f * sin(2.0f * (float)M_PI * key.GetFrequency() * detune * time) * exp(-time * (float)ot);
+		float detuneMultiplier = 0.02f;
+		overtonesValue += detuneMultiplier * sin(2.f * (float)M_PI * key.GetFrequency() * detune * time) * exp(-time * (float)ot);
 	}
 
 	return overtonesValue;
@@ -371,6 +378,8 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 	float totalKeyWidth = windowWidth - totalGapWidth;
 	float keyWidth = totalKeyWidth / numWhiteKeys;
 
+	float whiteKeyHeight = windowHeight / 3.f;
+
 	// Space out white keys
 	int keyIndex = 0;
 	for (int i = 0; i < g_number_of_keys; i++) {
@@ -378,7 +387,7 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 		if (IsKeyBlack(i + 21))
 			continue;
 
-		m_keys[i].SetHeight(windowHeight / 3.f);
+		m_keys[i].SetHeight(whiteKeyHeight);
 		sf::Vector2f position = { keyIndex * (keyWidth + gap), windowHeight - m_keys[i].GetHeight() };
 		m_keys[i].SetPosition(position);
 		m_keys[i].SetWidth(keyWidth);
@@ -386,14 +395,17 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 		keyIndex++;
 	}
 
+	float blackKeyHeightMultiplier = 0.6f;
+	float blackKeyWidthMultiplier = 0.5f;
+
 	// Space out black keys
 	for (int i = 1; i < g_number_of_keys; i++) {
 
 		if (!IsKeyBlack(i + 21))
 			continue;
 
-		m_keys[i].SetHeight(m_keys[i - 1].GetHeight() * 0.6f);
-		m_keys[i].SetWidth(keyWidth * 0.5f);
+		m_keys[i].SetHeight(m_keys[i - 1].GetHeight() * blackKeyHeightMultiplier);
+		m_keys[i].SetWidth(keyWidth * blackKeyWidthMultiplier);
 		sf::Vector2f position = { (m_keys[i - 1].GetPosition().x + m_keys[i - 1].GetWidth() - m_keys[i].GetWidth() / 2.f + gap / 2.f), m_keys[i - 1].GetPosition().y };
 		m_keys[i].SetPosition(position);
 	}
