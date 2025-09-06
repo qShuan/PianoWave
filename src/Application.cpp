@@ -126,6 +126,8 @@ void Application::Run() {
 
 		HandlePianoKeyStrikes();
 
+		m_piano.ClearSounds();
+
 		// Rendering
 		m_window.clear();
 

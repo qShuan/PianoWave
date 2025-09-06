@@ -17,6 +17,7 @@
 
 #include <future>
 #include <array>
+#include <list>
 
 constexpr size_t g_number_of_keys = 88;
 
@@ -33,7 +34,7 @@ class Piano {
 private:
 
 	std::array<sf::SoundBuffer, g_number_of_keys> m_sound_buffers;
-	std::vector<sf::Sound> m_sounds;
+	std::list<sf::Sound> m_sounds; // Using a list to avoid moving existing sounds (it breaks all moved sounds)
 
 	std::array<PianoKey, g_number_of_keys> m_keys;
 	std::vector<NoteEvent> m_note_events;
@@ -90,6 +91,8 @@ public:
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
 	void UpdateVolume();
+
+	void ClearSounds();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }

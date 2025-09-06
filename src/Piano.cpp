@@ -35,12 +35,8 @@ void Piano::GenerateKeySounds() {
 	}
 	m_key_sound_futures.clear();
 
-	// Assign sounds here because multithreading breaks the order
-	m_sounds.reserve(g_number_of_keys);
-	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
-
-		m_sounds.emplace_back(m_sound_buffers[keyNumber]);
-	}
+	// Reserve memory for sounds
+	//m_sounds.reserve(g_number_of_keys * 4);
 }
 
 // A sound for each key
@@ -192,10 +188,13 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	LOG("File {} has been successfully loaded", fileName);
 }
 
-// TODO: Create a new sound and place it in a vector, every frame check if the sound has stopped playing, if it has, remove it
 void Piano::StrikeKey(int keyNumber) {
 
-	m_sounds[keyNumber - 21].play();
+	// Create a new sound and play it
+	m_sounds.emplace_back(m_sound_buffers[keyNumber - 21]);
+	m_sounds.back().setVolume(m_volume);
+	m_sounds.back().play();
+
 	m_keys[keyNumber - 21].SetColor(g_pressed_key_color);
 	m_keys[keyNumber - 21].SetStruck(true);
 }
@@ -402,9 +401,21 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 void Piano::UpdateVolume() {
 
-	for (size_t i = 0; i < m_sounds.size(); i++) {
+	for (auto& sound : m_sounds) {
 
-		m_sounds[i].setVolume(m_volume);
+		sound.setVolume(m_volume);
+	}
+}
+
+// Remove all the sounds that have stopped
+void Piano::ClearSounds() {
+
+	for (auto it = m_sounds.begin(); it != m_sounds.end(); ) {
+
+		if (it->getStatus() == sf::Sound::Status::Stopped)
+			it = m_sounds.erase(it);
+		else
+			it++;
 	}
 }
 
