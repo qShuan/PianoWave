@@ -95,7 +95,8 @@ public:
 	void LoadMidiFile(const std::string& fileName);
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
-	void UpdateVolume();
+	void UpdateVolume(float volume);
+	void UpdatePlaybackSpeed(float playbackSpeed);
 
 	void StopAllSounds();
 
@@ -104,8 +105,8 @@ public:
 
 	double GetMidiFileDuration() const { return m_midi_file_duration; }
 	float GetCompositionElapsedTime() const { return m_composition_elapsed_time; }
-	float* GetCompositionPlaybackSpeed() { return &m_composition_playback_speed; }
-	float* GetVolume() { return &m_volume; }
+	float GetCompositionPlaybackSpeed() { return m_composition_playback_speed; }
+	float GetVolume() { return m_volume; }
 
 	bool IsCompositionPlaying() const { return m_is_composition_playing; }
 };

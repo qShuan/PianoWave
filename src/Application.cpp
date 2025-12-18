@@ -216,19 +216,21 @@ void Application::HandleGUI() {
 	ImGui::NewLine();
 
 	ImGui::SeparatorText("Controls");
-	ImGui::Text("Playback speed (restarts the composition)");
-	if (ImGui::SliderFloat("##composition_playback_speed", m_piano.GetCompositionPlaybackSpeed(), 1.f, 4.f)) {
 
-		m_piano.RestartComposition();
-		m_piano.PauseComposition();
+	float playbackSpeed = m_piano.GetCompositionPlaybackSpeed();
+	ImGui::Text("Playback speed");
+	if (ImGui::SliderFloat("##composition_playback_speed", &playbackSpeed, 1.f, 4.f)) {
+
+		m_piano.UpdatePlaybackSpeed(playbackSpeed);
 	}
 
 	ImGui::NewLine();
 
+	float volume = m_piano.GetVolume();
 	ImGui::Text("Volume");
-	if (ImGui::SliderFloat("##volume", m_piano.GetVolume(), 0.f, 100.f)) {
+	if (ImGui::SliderFloat("##volume", &volume, 0.f, 100.f)) {
 
-		m_piano.UpdateVolume();
+		m_piano.UpdateVolume(volume);
 	}
 
 	ImGui::End();

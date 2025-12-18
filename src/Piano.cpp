@@ -270,7 +270,7 @@ void Piano::PlayComposition() {
 	if (m_note_events.empty() || !m_is_composition_playing)
 		return;
 
-	m_composition_elapsed_time = m_composition_clock.getElapsedTime().asSeconds() * m_composition_playback_speed;
+	m_composition_elapsed_time += m_composition_clock.restart().asSeconds() * m_composition_playback_speed;
 
 	// Strike every note that has not been struck and the composition's elapsed time has surpassed it's start time
 	for (int i = 0; i < m_note_events.size(); i++) {
@@ -482,22 +482,31 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 	}
 }
 
-void Piano::UpdateVolume() {
+void Piano::UpdateVolume(float volume) {
+
+	m_volume = volume;
 
 	int activeSounds = GetActiveSoundsCount();
 
 	if (activeSounds == 0)
 		return;
 
-	float volume = m_volume / std::sqrtf((float)activeSounds);
-	float minVolume = m_volume * 0.2f;
+	// Decrease the volume depending on the amount of active sounds
+	float newVolume = m_volume / std::sqrtf((float)activeSounds);
 
-	volume = std::max(volume, minVolume);
+	// Clamp the volume not to go below 20% of the current m_volume
+	float minVolume = m_volume * 0.2f;
+	newVolume = std::max(newVolume, minVolume);
 
 	for (auto& sound : m_sounds) {
 
-		sound.setVolume(volume);
+		sound.setVolume(newVolume);
 	}
+}
+
+void Piano::UpdatePlaybackSpeed(float playbackSpeed) {
+
+	m_composition_playback_speed = playbackSpeed;
 }
 
 void Piano::StopAllSounds() {
