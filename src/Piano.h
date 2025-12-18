@@ -62,17 +62,30 @@ private:
 
 private:
 
+	// Generate samples for each key using threads
 	void GenerateKeySounds();
+
+	// Generate the waveform for a specific key
 	void GenerateKeyWaveForm(int keyNumber, float duration);
+
+	// Generates the raw audio samples
 	std::vector<int16_t> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
+
+	// Simulates harmonics to create the piano timbre
 	float GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency);
+
+	// Applies the volume envelope
 	float ADSR(float t, float duration, int keyNumber);
+
+	// Generate the frequency for a specific key
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
 
+	// Initialize the fixed-size sound pool
 	void InitSounds();
 
 	int GetActiveSoundsCount();
+
 	bool IsKeyBlack(int keyNumber) const;
 
 public:
@@ -82,28 +95,40 @@ public:
 
 	void DrawKeys(sf::RenderWindow& window);
 
+	// Play a specific note using the sound pool
 	void StrikeKey(int keyNumber);
 
+	// Set the key's color back to it's original and set it's struck flag to false
 	void ReleaseKey(int keyNumber);
 	void ReleaseKeys();
 
+	// Play the loaded .mid file
 	void PlayComposition();
+
 	void StartComposition();
 	void PauseComposition();
 	void RestartComposition();
+
+	// Set all note events' struck flag to false 
 	void ResetNoteEvents();
+
+	// Parse the MIDI file
 	void LoadMidiFile(const std::string& fileName);
 
+	// Place the keys in correct positions
 	void SetKeyPositions(float windowWidth, float windowHeight);
+
 	void UpdateVolume(float volume);
 	void UpdatePlaybackSpeed(float playbackSpeed);
 
 	void StopAllSounds();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
+
 	std::array<PianoKey, g_number_of_keys>& GetKeys() { return m_keys; }
 
 	double GetMidiFileDuration() const { return m_midi_file_duration; }
+
 	float GetCompositionElapsedTime() const { return m_composition_elapsed_time; }
 	float GetCompositionPlaybackSpeed() { return m_composition_playback_speed; }
 	float GetVolume() { return m_volume; }

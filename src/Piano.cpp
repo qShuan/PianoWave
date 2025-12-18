@@ -25,6 +25,7 @@ void Piano::GenerateKeySounds() {
 	float duration = 3.f;
 
 	LOG("Creating threads");
+
 	// Generate samples for each key
 	for (int keyNumber = 0; keyNumber < g_number_of_keys; keyNumber++) {
 
@@ -32,17 +33,14 @@ void Piano::GenerateKeySounds() {
 	}
 
 	LOG("Waiting for threads to finish");
+
 	// Wait for all threads to finish before using the buffers
 	for (auto& future : m_key_sound_futures) {
 		future.get();
 	}
 	m_key_sound_futures.clear();
-
-	// Reserve memory for sounds
-	//m_sounds.reserve(g_number_of_keys * 4);
 }
 
-// A sound for each key
 void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	PianoKey& key = m_keys[keyNumber];
@@ -264,7 +262,6 @@ void Piano::ReleaseKeys() {
 	}
 }
 
-// Play the loaded .mid file
 void Piano::PlayComposition() {
 
 	if (m_note_events.empty() || !m_is_composition_playing)
@@ -364,7 +361,6 @@ void Piano::ResetNoteEvents() {
 	}
 }
 
-// The ADSR envelope
 float Piano::ADSR(float t, float duration, int keyNumber) {
 
 	float sustainLevel = 0.7f;
@@ -438,7 +434,6 @@ void Piano::InitSounds() {
 	}
 }
 
-// Place the keys in correct positions
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 	float gap = 2.f;
