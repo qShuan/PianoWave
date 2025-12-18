@@ -5,7 +5,7 @@
 
 #include <utils/logging.hpp>
 
-class GUI {
+class ImGuiHandler {
 
 private:
 
@@ -13,9 +13,9 @@ private:
 
 public:
 
-	GUI();
-	GUI(sf::RenderWindow& window);
-	~GUI() = default;
+	ImGuiHandler();
+	ImGuiHandler(sf::RenderWindow& window);
+	~ImGuiHandler() = default;
 
 	void Init(sf::RenderWindow& window);
 	void Update(sf::RenderWindow& window, sf::Time dt);

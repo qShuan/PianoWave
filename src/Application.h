@@ -1,5 +1,5 @@
 #include "Piano.h"
-#include "GUI.h"
+#include "ImGuiHandler.h"
 #include "NFDHandler.h"
 
 struct WindowSettings {
@@ -22,7 +22,7 @@ private:
 
 	NFDHandler m_nfd_handler;
 
-	GUI m_gui;
+	ImGuiHandler m_imgui_handler;
 
 	bool m_is_mouse_left_pressed;
 

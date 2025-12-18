@@ -3,7 +3,7 @@
 Application::Application()
 	: m_piano_keys(m_piano.GetKeys()),
 	m_window(sf::RenderWindow(sf::VideoMode({ m_window_settings.width, m_window_settings.height }), m_window_settings.name, sf::Style::Default)),
-	m_gui(GUI(m_window)),
+	m_imgui_handler(ImGuiHandler(m_window)),
 	m_is_mouse_left_pressed(false) {
 
 	m_window.setKeyRepeatEnabled(false);
@@ -15,7 +15,7 @@ void Application::HandleEvents(const std::optional<sf::Event>& event) {
 	if (!event)
 		return;
 
-	m_gui.ProcessEvent(m_window, event);
+	m_imgui_handler.ProcessEvent(m_window, event);
 
 	if (event->is<sf::Event::Closed>()) {
 
@@ -122,7 +122,7 @@ void Application::Run() {
 
 		// Logic
 		sf::Time sec = clock.restart();
-		m_gui.Update(m_window, sec);
+		m_imgui_handler.Update(m_window, sec);
 
 		m_piano.PlayComposition();
 
@@ -134,12 +134,12 @@ void Application::Run() {
 		m_piano.DrawKeys(m_window);
 
 		HandleGUI();
-		m_gui.Render(m_window);
+		m_imgui_handler.Render(m_window);
 
 		m_window.display();
 	}
 
-	m_gui.Close();
+	m_imgui_handler.Close();
 }
 
 void Application::HandleGUI() {

@@ -1,43 +1,43 @@
-#include "GUI.h"
+#include "ImGuiHandler.h"
 
-GUI::GUI()
+ImGuiHandler::ImGuiHandler()
 	: m_style(nullptr) {}
 
-GUI::GUI(sf::RenderWindow& window)
+ImGuiHandler::ImGuiHandler(sf::RenderWindow& window)
 	: m_style(nullptr) {
 
 	Init(window);
     InitStyle();
 }
 
-void GUI::Init(sf::RenderWindow& window) {
+void ImGuiHandler::Init(sf::RenderWindow& window) {
 
 	LOG("Initializing ImGUI");
 	(void)ImGui::SFML::Init(window);
 }
 
-void GUI::Update(sf::RenderWindow& window, sf::Time dt) {
+void ImGuiHandler::Update(sf::RenderWindow& window, sf::Time dt) {
 
 	ImGui::SFML::Update(window, dt);
 }
 
-void GUI::ProcessEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
+void ImGuiHandler::ProcessEvent(sf::RenderWindow& window, const std::optional<sf::Event>& event) {
 
 	ImGui::SFML::ProcessEvent(window, *event);
 }
 
-void GUI::Render(sf::RenderWindow& window) {
+void ImGuiHandler::Render(sf::RenderWindow& window) {
 
 	ImGui::SFML::Render(window);
 }
 
-void GUI::Close() {
+void ImGuiHandler::Close() {
 
 	LOG("Closing ImGUI");
 	ImGui::SFML::Shutdown();
 }
 
-void GUI::InitStyle() {
+void ImGuiHandler::InitStyle() {
 
 	m_style = &ImGui::GetStyle();
 
