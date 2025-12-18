@@ -4,20 +4,16 @@
 #include <math.h>
 
 #include <SFML/Audio.hpp>
-#include <SFML/System/Time.hpp>
 
 #include <fstream>
-#include <sstream>
 
 #include "PianoKey.h"
 
 #include <midifile/MidiFile.h>
-#include <utils/rng.hpp>
 #include <utils/logging.hpp>
 
 #include <future>
 #include <array>
-#include <list>
 
 constexpr size_t g_number_of_keys = 88;
 
