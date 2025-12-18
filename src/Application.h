@@ -24,6 +24,8 @@ private:
 
 	ImGuiHandler m_imgui_handler;
 
+	std::string m_file_name;
+
 	bool m_is_mouse_left_pressed;
 
 private:

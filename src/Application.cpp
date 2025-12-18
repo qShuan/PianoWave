@@ -4,6 +4,7 @@ Application::Application()
 	: m_piano_keys(m_piano.GetKeys()),
 	m_window(sf::RenderWindow(sf::VideoMode({ m_window_settings.width, m_window_settings.height }), m_window_settings.name, sf::Style::Default)),
 	m_imgui_handler(ImGuiHandler(m_window)),
+	m_file_name("Not selected"),
 	m_is_mouse_left_pressed(false) {
 
 	m_window.setKeyRepeatEnabled(false);
@@ -160,10 +161,15 @@ void Application::HandleGUI() {
 		if (result == NFD_OKAY) {
 
 			m_piano.LoadMidiFile(m_nfd_handler.GetPath());
+
+			// Extract .mid filename
+			std::filesystem::path midiPath(m_nfd_handler.GetPath());
+			m_file_name = midiPath.filename().string();
 		}
 	}
 
-	ImGui::Text("File: %s", m_nfd_handler.GetPath() == nullptr ? "not selected" : m_nfd_handler.GetPath());
+
+	ImGui::Text("File: %s", m_file_name.c_str());
 
 	ImGui::SeparatorText("Composition");
 	if (ImGui::Button("Start")) {
