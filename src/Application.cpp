@@ -152,6 +152,8 @@ void Application::HandleGUI() {
 	ImGui::SeparatorText("Files");
 	if (ImGui::Button("Select midi")) {
 
+		m_piano.PauseComposition();
+
 		nfdfilteritem_t filters[1] = { {"Midi files", "mid"}};
 		nfdresult_t result = m_nfd_handler.OpenDialog(filters, 1);
 
