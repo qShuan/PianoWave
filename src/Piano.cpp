@@ -146,9 +146,6 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 	LOG("Loading file: {}", fileName);
 
-	m_note_events.clear();
-	m_pressed_note_indices.clear();
-
 	std::ifstream file(fileName, std::ios::binary);
 
 	if (!file.is_open()) {
@@ -162,6 +159,9 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 		LOG("Midifile {} couldn't be loaded", fileName);
 		return;
 	}
+
+	m_note_events.clear();
+	m_pressed_note_indices.clear();
 
 	midifile.doTimeAnalysis();
 	midifile.linkNotePairs();
@@ -190,6 +190,9 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 	}
 
 	m_is_composition_playing = false;
+	m_composition_clock.reset();
+	m_composition_elapsed_time = 0.f;
+
 	m_midi_file_duration = midifile.getFileDurationInSeconds();
 
 	LOG("File {} has been successfully loaded", fileName);
@@ -210,6 +213,14 @@ void Piano::ReleaseKey(int keyNumber) {
 
 	m_keys[keyNumber - 21].SetColor(m_keys[keyNumber - 21].GetOriginalColor());
 	m_keys[keyNumber - 21].SetStruck(false);
+}
+
+void Piano::ReleaseKeys() {
+
+	for (size_t i = 0; i < m_keys.size(); i++) {
+
+		ReleaseKey(m_keys[i].GetMidiNote());
+	}
 }
 
 // Play the loaded .mid file
@@ -263,10 +274,8 @@ void Piano::StartComposition() {
 
 		m_composition_clock.restart();
 
-		for (size_t i = 0; i < m_note_events.size(); i++) {
-
-			m_note_events[i].hasBeenStruck = false;
-		}
+		ResetNoteEvents();
+		ReleaseKeys();
 	}
 	else {
 
@@ -290,22 +299,23 @@ void Piano::RestartComposition() {
 	if (m_note_events.empty())
 		return;
 
-	m_composition_elapsed_time = 0;
 	m_composition_clock.restart();
+	m_composition_elapsed_time = 0;
+
+	ResetNoteEvents();
+	ReleaseKeys();
+
+	m_pressed_note_indices.clear();
+
+	m_is_composition_playing = true;
+}
+
+void Piano::ResetNoteEvents() {
 
 	for (size_t i = 0; i < m_note_events.size(); i++) {
 
 		m_note_events[i].hasBeenStruck = false;
 	}
-
-	for (size_t i = 0; i < m_keys.size(); i++) {
-
-		ReleaseKey(m_keys[i].GetMidiNote());
-	}
-
-	m_pressed_note_indices.clear();
-
-	m_is_composition_playing = true;
 }
 
 // The ADSR envelope

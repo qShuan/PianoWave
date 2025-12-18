@@ -82,11 +82,13 @@ public:
 	void StrikeKey(int keyNumber);
 
 	void ReleaseKey(int keyNumber);
+	void ReleaseKeys();
 
 	void PlayComposition();
 	void StartComposition();
 	void PauseComposition();
 	void RestartComposition();
+	void ResetNoteEvents();
 	void LoadMidiFile(const std::string& fileName);
 
 	void SetKeyPositions(float windowWidth, float windowHeight);
