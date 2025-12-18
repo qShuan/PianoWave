@@ -7,10 +7,13 @@ Piano::Piano()
 	m_composition_elapsed_time(0.f),
 	m_composition_playback_speed(1.f),
 	m_volume(100.f),
+	m_number_of_voices(512),
 	m_is_composition_playing(false) {
 
 	GenerateKeyFrequencies();
 	GenerateKeySounds();
+	
+	InitSounds();
 
 	LOG("Piano has been initialized");
 }
@@ -200,10 +203,38 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 void Piano::StrikeKey(int keyNumber) {
 
-	// Create a new sound and play it
-	m_sounds.emplace_back(m_sound_buffers[keyNumber - 21]);
-	m_sounds.back().setVolume(m_volume);
-	m_sounds.back().play();
+	int activeSounds = GetActiveSoundsCount() + 1;
+
+	// Decrease the volume depending on the amount of active sounds
+	float volume = m_volume / std::sqrtf((float)activeSounds);
+
+	// Clamp the volume not to go below 20% of the current m_volume
+	float minVolume = m_volume * 0.2f;
+	volume = std::max(volume, minVolume);
+
+	// Play the first free sound
+	bool played = false;
+	for (auto& sound : m_sounds) {
+
+		if (sound.getStatus() != sf::Sound::Status::Playing) {
+
+			sound.setBuffer(m_sound_buffers[keyNumber - 21]);
+			sound.setVolume(volume);
+			sound.play();
+			played = true;
+
+			break;
+		}
+	}
+
+	// If no free sound was found, play on the oldest
+	if (!played) {
+
+		m_sounds[0].stop();
+		m_sounds[0].setBuffer(m_sound_buffers[keyNumber - 21]);
+		m_sounds[0].setVolume(volume);
+		m_sounds[0].play();
+	}
 
 	m_keys[keyNumber - 21].SetColor(g_pressed_key_color);
 	m_keys[keyNumber - 21].SetStruck(true);
@@ -273,6 +304,7 @@ void Piano::StartComposition() {
 	if (m_composition_clock.isRunning()) {
 
 		m_composition_clock.restart();
+		m_composition_elapsed_time = 0;
 
 		ResetNoteEvents();
 		ReleaseKeys();
@@ -280,6 +312,10 @@ void Piano::StartComposition() {
 	else {
 
 		m_composition_clock.start();
+
+		// If the composition hasn't started, release all keys
+		if(m_composition_elapsed_time < 0.0001f)
+			ReleaseKeys();
 	}
 
 	m_is_composition_playing = true;
@@ -382,6 +418,16 @@ void Piano::GenerateKeyFrequencies() {
 	}
 }
 
+void Piano::InitSounds() {
+
+	m_sounds.reserve(m_number_of_voices);
+
+	for (int i = 0; i < m_number_of_voices; i++) {
+
+		m_sounds.emplace_back(m_sound_buffers[0]);
+	}
+}
+
 // Place the keys in correct positions
 void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
@@ -428,21 +474,19 @@ void Piano::SetKeyPositions(float windowWidth, float windowHeight) {
 
 void Piano::UpdateVolume() {
 
+	int activeSounds = GetActiveSoundsCount();
+
+	if (activeSounds == 0)
+		return;
+
+	float volume = m_volume / std::sqrtf((float)activeSounds);
+	float minVolume = m_volume * 0.2f;
+
+	volume = std::max(volume, minVolume);
+
 	for (auto& sound : m_sounds) {
 
-		sound.setVolume(m_volume);
-	}
-}
-
-// Remove all the sounds that have stopped
-void Piano::ClearSounds() {
-
-	for (auto it = m_sounds.begin(); it != m_sounds.end(); ) {
-
-		if (it->getStatus() == sf::Sound::Status::Stopped)
-			it = m_sounds.erase(it);
-		else
-			it++;
+		sound.setVolume(volume);
 	}
 }
 
@@ -467,6 +511,19 @@ void Piano::DrawKeys(sf::RenderWindow& window) {
 		if (IsKeyBlack(i + 21))
 			m_keys[i].Draw(window);
 	}
+}
+
+int Piano::GetActiveSoundsCount() {
+
+	int activeSounds = 0;
+	
+	for (int i = 0; i < g_number_of_keys; i++) {
+
+		if (m_sounds[i].getStatus() == sf::Sound::Status::Playing)
+			activeSounds++;
+	}
+
+	return activeSounds;
 }
 
 bool Piano::IsKeyBlack(int keyNumber) const {

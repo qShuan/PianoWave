@@ -34,7 +34,7 @@ class Piano {
 private:
 
 	std::array<sf::SoundBuffer, g_number_of_keys> m_sound_buffers;
-	std::list<sf::Sound> m_sounds; // Using a list to avoid moving existing sounds (it breaks all moved sounds)
+	std::vector<sf::Sound> m_sounds;
 
 	std::array<PianoKey, g_number_of_keys> m_keys;
 	std::vector<NoteEvent> m_note_events;
@@ -44,8 +44,6 @@ private:
 	std::vector<int> m_pressed_note_indices;
 
 	std::vector<int16_t> m_samples;
-
-	std::mutex m_sounds_mutex;
 
 	double m_midi_file_duration;
 
@@ -57,6 +55,8 @@ private:
 	float m_composition_playback_speed;
 
 	float m_volume;
+
+	int m_number_of_voices;
 
 	bool m_is_composition_playing;
 
@@ -70,6 +70,9 @@ private:
 	float GenerateKeyFrequency(int keyNumber);
 	void GenerateKeyFrequencies();
 
+	void InitSounds();
+
+	int GetActiveSoundsCount();
 	bool IsKeyBlack(int keyNumber) const;
 
 public:
@@ -94,7 +97,6 @@ public:
 	void SetKeyPositions(float windowWidth, float windowHeight);
 	void UpdateVolume();
 
-	void ClearSounds();
 	void StopAllSounds();
 
 	PianoKey& GetKey(int keyNumber) { return m_keys[keyNumber - 21]; }
