@@ -203,6 +203,11 @@ void Piano::LoadMidiFile(const std::string& fileName) {
 
 void Piano::StrikeKey(int keyNumber) {
 
+	int key = keyNumber - 21;
+
+	if (key < 0 || key >= g_number_of_keys)
+		return;
+
 	int activeSounds = GetActiveSoundsCount() + 1;
 
 	// Decrease the volume depending on the amount of active sounds
@@ -218,7 +223,7 @@ void Piano::StrikeKey(int keyNumber) {
 
 		if (sound.getStatus() != sf::Sound::Status::Playing) {
 
-			sound.setBuffer(m_sound_buffers[keyNumber - 21]);
+			sound.setBuffer(m_sound_buffers[key]);
 			sound.setVolume(volume);
 			sound.play();
 			played = true;
@@ -231,19 +236,24 @@ void Piano::StrikeKey(int keyNumber) {
 	if (!played) {
 
 		m_sounds[0].stop();
-		m_sounds[0].setBuffer(m_sound_buffers[keyNumber - 21]);
+		m_sounds[0].setBuffer(m_sound_buffers[key]);
 		m_sounds[0].setVolume(volume);
 		m_sounds[0].play();
 	}
 
-	m_keys[keyNumber - 21].SetColor(g_pressed_key_color);
-	m_keys[keyNumber - 21].SetStruck(true);
+	m_keys[key].SetColor(g_pressed_key_color);
+	m_keys[key].SetStruck(true);
 }
 
 void Piano::ReleaseKey(int keyNumber) {
 
-	m_keys[keyNumber - 21].SetColor(m_keys[keyNumber - 21].GetOriginalColor());
-	m_keys[keyNumber - 21].SetStruck(false);
+	int key = keyNumber - 21;
+
+	if (key < 0 || key >= g_number_of_keys)
+		return;
+
+	m_keys[key].SetColor(m_keys[key].GetOriginalColor());
+	m_keys[key].SetStruck(false);
 }
 
 void Piano::ReleaseKeys() {
