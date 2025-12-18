@@ -95,6 +95,8 @@ To compile and run this project, make sure you have:
 
 [Sound Generation](https://www.youtube.com/watch?v=5xd9BMxoXqo)
 
+[Sound Clipping](https://cycling74.com/forums/your-magic-formulas-for-amp-reduction-when-adding-audio-signals)
+
 ---
 
 ## License
