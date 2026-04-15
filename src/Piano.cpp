@@ -103,12 +103,8 @@ std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, flo
 
 float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency) {
 
-	float brightnessBoost = 1.f;
-	float decayFactor = 1.f;
-
 	float overtonesValue = 0.f;
 
-	float maxDecay = 3.f;
 	float minBrightnessBoost = 0.5f;
 
 	for (int ot = 1; ot <= maxOvertones; ot++) {
@@ -117,26 +113,20 @@ float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, f
 
 		float overtoneFrequency = key.GetFrequency() * ot;
 
-		//The higher the note, the faster it decays
-		decayFactor += (maxDecay - decayFactor) * normalizedFrequency;
-
-		// The higher the note, the more quiet it becomes
-		brightnessBoost += (minBrightnessBoost - brightnessBoost) * normalizedFrequency;
-
 		// Sawtooth wave
-		overtonesValue += brightnessBoost * (
+		overtonesValue += (
 			sign * sin(2.f * (float)M_PI * overtoneFrequency * time) / ((float)ot)
-			) * exp(-time * ot * decayFactor);
+			);
 
 		//Triangle wave
-		overtonesValue += brightnessBoost * (
+		overtonesValue += (
 			sign * sin(2.f * (float)M_PI * (2.f * ot - 1) * key.GetFrequency() * time) / ((2.f * ot - 1) * (2.f * ot - 1) * 2.f)
-			) * exp(-time * ot * decayFactor);
+			);
 
 		// Detuning
 		float detune = 1.002f;
 		float detuneMultiplier = 0.02f;
-		overtonesValue += detuneMultiplier * sin(2.f * (float)M_PI * key.GetFrequency() * detune * time) * exp(-time * (float)ot);
+		overtonesValue += detuneMultiplier * sin(2.f * (float)M_PI * key.GetFrequency() * detune * time);
 	}
 
 	return overtonesValue;
@@ -362,46 +352,31 @@ void Piano::ResetNoteEvents() {
 
 float Piano::ADSR(float t, float duration, int keyNumber) {
 
-	float sustainLevel = 0.7f;
-	float attackTime = 0.01f;
-	float decayTime = 0.1f;
+	float attackTime = 0.063f;
+	float decayTime = 1.5f;
 
-	if (m_keys[keyNumber].GetFrequency() > 2000.f) {
-		sustainLevel = 0.4f;
-		attackTime = 0.005f;
-		decayTime = 0.05f;
-	}
-
-	float releaseTime = 0.35f;
-	float sustainTime = duration - (attackTime + decayTime + releaseTime);
+	float value = 0.0f;
 
 	// Attack
-	if (t < attackTime) 
-		return t / attackTime;
+	if (t < attackTime) {
+
+		float prog = t / attackTime;
+
+		float steepness = 5.0f;
+		value = (1.0f - std::exp(-steepness * prog)) / (1.0f - std::exp(-steepness));
+	}
 
 	// Decay
-	else if (t < attackTime + decayTime) {
-		float prog = (t - attackTime) / decayTime;
-		return 1.f - prog * (1.f - sustainLevel);
-	}
-
-	// Sustain
-	else if(t < duration - releaseTime)
-		return sustainLevel;
-
-	// Release
 	else if (t < duration) {
 
-		float relProg = (t - (duration - releaseTime)) / releaseTime;
-		float ampl = sustainLevel * (1.f - relProg);
+		float decayTimer = t - attackTime;
+		float prog = decayTimer / decayTime;
 
-		if (ampl < 0.0001f)
-			return 0.f;
-
-		return ampl;
+		float steepness = 4.0f;
+		value = (std::exp(-steepness * prog) - std::exp(-steepness)) / (1.0f - std::exp(-steepness));
 	}
 
-	return 0.f;
+	return std::max(0.0f, value);
 }
 
 float Piano::GenerateKeyFrequency(int keyNumber) {
