@@ -44,89 +44,97 @@ void Piano::GenerateKeyWaveForm(int keyNumber, float duration) {
 
 	PianoKey& key = m_keys[keyNumber];
 
-	std::vector<int16_t> samples = GenerateKeySamples(key, keyNumber, duration);
+	std::vector<int16_t> samples = GenerateKeySamples(key, duration);
 
 	(void)m_sound_buffers[keyNumber].loadFromSamples(samples.data(), samples.size(), 1, (unsigned int)m_sample_rate, {sf::SoundChannel::FrontLeft, sf::SoundChannel::FrontRight});
 
 	LOG("Key: {} has been generated", keyNumber);
 }
 
-std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, int keyNumber, float duration) {
+
+float Lerp(float a, float b, float t) {
+	return a + (b - a) * t;
+}
+
+float InverseLerp(float a, float b, float value) {
+
+	if (std::abs(a - b) < 0.0001f) return 0.f;
+
+	float t = (value - a) / (b - a);
+
+	return std::max(0.f, std::min(1.0f, t));
+}
+
+std::vector<int16_t> Piano::GenerateKeySamples(PianoKey& key, float duration) {
 
 	int totalSamplesCount = (int)(m_sample_rate * duration);
 
 	std::vector<int16_t> samples;
 	samples.resize(totalSamplesCount);
 
-	float maxFreq = 4187.f;
-	float normalizedFrequency = key.GetFrequency() / maxFreq;
-
-	int maxOvertones = std::min(10, (int)(m_sample_rate / (2 * key.GetFrequency())));
-
-	float maxAmplitude = 32767.f;
-	float amplitudeMultiplier = 0.1f;
-
 	for (int i = 0; i < totalSamplesCount; i++) {
 
-		float t = (float)i / (m_sample_rate);
+		float time = (float)i / (m_sample_rate);
 
-		float sampleValue = 0.f;
-		float hammerStrikeEffectValue = 0.f;
-
-		// A hammer strike effect
-		if (t < 0.1f) {
-
-			for (int ot = maxOvertones / 2; ot <= maxOvertones; ot++) {
-
-				float overtoneFrequency = key.GetFrequency() * ot;
-				hammerStrikeEffectValue += 2.f * cos(0.1f * (float)M_PI * overtoneFrequency * t) * exp(-t * 1000.f);
-			}
-		}
-
-		sampleValue += hammerStrikeEffectValue;
-
-		// Add overtones
-		float overtonesValue = GenerateKeyOvertones(key, maxOvertones, t, normalizedFrequency);
-		sampleValue += overtonesValue;
-
-		// Apply amplitude modifications
-		float env = ADSR(t, duration, keyNumber);
-		sampleValue *= 2.f / (float)M_PI + 8.f / ((float)M_PI * (float)M_PI);
-		sampleValue *= env;
-
-		int16_t sample = (int16_t)(maxAmplitude * amplitudeMultiplier * sampleValue);
+		int16_t sample = (int16_t)GenerateKeyOvertones(key, time);
 		samples[i] = sample;
 	}
 
 	return samples;
 }
 
-float Piano::GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency) {
+float Piano::GenerateKeyOvertones(PianoKey& key, float time) {
 
 	float overtonesValue = 0.f;
 
-	float minBrightnessBoost = 0.5f;
+	float maxAmplitude = 32767.f;
+	float amplitudeMultiplier = 0.2f;
 
-	for (int ot = 1; ot <= maxOvertones; ot++) {
+	float midi = (float)key.GetMidiNote();
 
-		float sign = (ot % 2 == 0 ? 1.f : -1.f);
+	// Get the right segment on the piano
+	int segment = 0;
+	for (int i = 0; i < g_midi_points.size() - 1; i++) {
+
+		if (midi <= g_midi_points[i + 1]) {
+
+			segment = i;
+			break;
+		}
+	}
+
+	float t = InverseLerp(g_midi_points[segment], g_midi_points[segment + 1], midi);
+
+	const auto& profileA = g_amp_profiles[segment];
+	const auto& profileB = g_amp_profiles[segment + 1];
+
+	for (int ot = 1; ot <= g_max_overtones; ot++) {
+
+		// float sign = (ot % 2 == 0 ? 1.f : -1.f);
 
 		float overtoneFrequency = key.GetFrequency() * ot;
 
+		float targetAmplitude = Lerp(profileA[ot - 1], profileB[ot - 1], t);
+		targetAmplitude *= ADSR(time, 5.f, key.GetMidiNote() - 21) * maxAmplitude * amplitudeMultiplier;
+
 		// Sawtooth wave
-		overtonesValue += (
+		/*overtonesValue += (
 			sign * sin(2.f * (float)M_PI * overtoneFrequency * time) / ((float)ot)
-			);
+			) * targetAmplitude;*/
 
 		//Triangle wave
-		overtonesValue += (
-			sign * sin(2.f * (float)M_PI * (2.f * ot - 1) * key.GetFrequency() * time) / ((2.f * ot - 1) * (2.f * ot - 1) * 2.f)
-			);
+		/*overtonesValue += (
+			sign * sin(2.f * (float)M_PI * (2.f * ot - 1) * overtoneFrequency * time) / ((2.f * ot - 1) * (2.f * ot - 1) * 2.f)
+			) * targetAmplitude;*/
 
 		// Detuning
 		float detune = 1.002f;
 		float detuneMultiplier = 0.02f;
-		overtonesValue += detuneMultiplier * sin(2.f * (float)M_PI * key.GetFrequency() * detune * time);
+
+		float phase = 2.f * (float)M_PI * overtoneFrequency * time;
+		
+		overtonesValue += targetAmplitude * sin(phase);
+		overtonesValue += targetAmplitude * detuneMultiplier * sin(phase);
 	}
 
 	return overtonesValue;

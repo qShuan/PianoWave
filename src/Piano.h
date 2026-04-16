@@ -25,6 +25,38 @@ struct NoteEvent {
 	bool hasBeenStruck = false;
 };
 
+constexpr int g_max_overtones = 16;
+constexpr int g_midi_sections = 8;
+
+constexpr std::array<float, g_max_overtones> g_amp_A0 = { 0.4f, 0.6f, 0.8f, 1.0f, 0.9f, 0.7f, 0.5f, 0.35f, 0.25f, 0.15f, 0.1f, 0.08f, 0.06f, 0.04f, 0.02f, 0.01f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C2 = { 0.6f, 0.8f, 1.0f, 0.8f, 0.6f, 0.4f, 0.3f, 0.2f, 0.15f, 0.1f, 0.08f, 0.06f, 0.04f, 0.02f, 0.01f, 0.01f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C3 = { 0.8f, 1.0f, 0.7f, 0.5f, 0.35f, 0.25f, 0.15f, 0.1f, 0.08f, 0.05f, 0.04f, 0.03f, 0.02f, 0.01f, 0.015f, 0.f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C4 = { 1.0f, 0.7f, 0.4f, 0.25f, 0.15f, 0.1f, 0.08f, 0.05f, 0.04f, 0.03f, 0.02f, 0.01f, 0.01f, 0.01f, 0.01f, 0.f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C5 = { 1.0f, 0.4f, 0.2f, 0.1f, 0.05f, 0.03f, 0.02f, 0.01f, 0.01f, 0.01f, 0.005f, 0.005f, 0.005f, 0.0f, 0.0f, 0.f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C6 = { 1.0f, 0.15f, 0.05f, 0.02f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C7 = { 1.0f, 0.12f, 0.03f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
+constexpr std::array<float, g_max_overtones> g_amp_C8 = { 1.0f, 0.1f, 0.02f, 0.01f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+
+constexpr std::array<float, g_midi_sections> g_midi_points = { 21.f, 36.f, 48.f, 60.f, 72.f, 84.f, 96.f, 108.f };
+
+constexpr std::array<std::array<float, g_max_overtones>, g_midi_sections> g_amp_profiles = {
+	g_amp_A0,
+	g_amp_C2,
+	g_amp_C3,
+	g_amp_C4,
+	g_amp_C5,
+	g_amp_C6,
+	g_amp_C7,
+	g_amp_C8
+};
+
 class Piano {
 
 private:
@@ -65,10 +97,10 @@ private:
 	void GenerateKeyWaveForm(int keyNumber, float duration);
 
 	// Generates the raw audio samples
-	std::vector<int16_t> GenerateKeySamples(PianoKey& key, int keyNumber, float duration);
+	std::vector<int16_t> GenerateKeySamples(PianoKey& key, float duration);
 
 	// Simulates harmonics to create the piano timbre
-	float GenerateKeyOvertones(PianoKey& key, int maxOvertones, float time, float normalizedFrequency);
+	float GenerateKeyOvertones(PianoKey& key, float time);
 
 	// Applies the volume envelope
 	float ADSR(float t, float duration, int keyNumber);
