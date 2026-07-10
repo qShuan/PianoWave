@@ -3,6 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Compile commands
+compile_commands/
+compile_commands.json
+
+# Clang
+.clangd
+
 # Because I'm using premake
 *.sln
 *.vcxproj
