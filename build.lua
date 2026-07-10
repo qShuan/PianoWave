@@ -1,3 +1,10 @@
+local success, err = pcall(require, "export-compile-commands")
+if not success then
+    print("Note: export-compile-commands module not found. compile_commands.json will not be generated.")
+end
+
+local CXX_STANDARD = "C++23"
+
 workspace "Piano Wave"
     architecture "x64"
     configurations { "Debug", "Release" }
@@ -6,7 +13,7 @@ workspace "Piano Wave"
 project "PianoWave"
     kind "ConsoleApp"
     language "C++"
-    cppdialect "C++23"
+    cppdialect(CXX_STANDARD)
     staticruntime "Off"
     targetdir "bin/%{cfg.architecture}/%{cfg.buildcfg}"
     objdir    "obj/%{cfg.architecture}/%{cfg.buildcfg}"
@@ -81,3 +88,13 @@ project "PianoWave"
             "NDEBUG",
             "_CONSOLE"
         }
+
+if success then
+    local clangd_file = io.open(".clangd", "w")
+    if clangd_file then
+        clangd_file:write("CompileFlags:\n")
+        clangd_file:write("  Add:\n")
+        clangd_file:write("    - \"-std=" .. CXX_STANDARD:lower() .. "\"\n")
+        clangd_file:close()
+    end
+end
