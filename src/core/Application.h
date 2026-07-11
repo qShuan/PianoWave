@@ -1,6 +1,6 @@
-#include "Piano.h"
-#include "ImGuiHandler.h"
-#include "NFDHandler.h"
+#include "piano/Piano.h"
+#include "ui/ImGuiHandler.h"
+#include "ui/NFDHandler.h"
 
 struct WindowSettings {
 
